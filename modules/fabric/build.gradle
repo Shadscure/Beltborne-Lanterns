@@ -102,7 +102,7 @@ modrinth {
     projectId = "NUFDZAKS"
     versionNumber = "${project.version}-fabric"
     versionName   = "Beltborne Lanterns v${project.version}+${rootProject.minecraft_version} [Fabric/Quilt]"
-    versionType   = "release"                 // или "beta"/"alpha"
+    versionType   = "beta"                 // или "beta"/"alpha"
     gameVersions  = [ rootProject.minecraft_version ]
     loaders       = [ "fabric","quilt" ]
     uploadFile    = remapJar                   // из Loom
@@ -133,7 +133,7 @@ tasks.register("curseforge", net.darkhax.curseforgegradle.TaskPublishCurseForge)
     def mainFile = upload(curse_project_id as String, remapJar)
 
     mainFile.displayName = "Beltborne Lanterns v${project.version}+${rootProject.minecraft_version} [Fabric/Quilt]"
-    mainFile.releaseType = "release"
+    mainFile.releaseType = "beta"
     mainFile.addModLoader("Fabric")
     mainFile.addModLoader("Quilt")
     mainFile.addGameVersion("${rootProject.minecraft_version}")

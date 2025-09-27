@@ -1,3 +1,5 @@
 ## Changelog
-### 🐞 Bug fixes 
-- Fixed rare crashes on NeoForge due to a hidden NPE when using `Atomicstryker Dynamiclights` 
+### 🔁 Backport
+- Port project on **1.20.1 (Fabric)**. 
+
+There are no functional changes - only transfer to the required version.
