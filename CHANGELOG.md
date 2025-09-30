@@ -1,3 +1,4 @@
 ## Changelog
-### 🐞 Bug fixes 
-- Fixed rare crashes on NeoForge due to a hidden NPE when using `Atomicstryker Dynamiclights` 
+### ✨ Improvements
+- Pressing the lantern key now moves the lantern from the belt straight into the selected hotbar slot for quick access.
+- Changed LDL support to a new, cleaner method
