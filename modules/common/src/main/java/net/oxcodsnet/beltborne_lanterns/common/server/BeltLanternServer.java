@@ -1,5 +1,6 @@
 package net.oxcodsnet.beltborne_lanterns.common.server;
 
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -43,14 +44,40 @@ public final class BeltLanternServer {
             return item;
         } else {
             if (!creative) {
-                // Return the exact stored stack with NBT back to the player
+                // Return the exact stored stack (including NBT) into the selected hotbar slot
                 ItemStack stored = BeltState.getLampStack(player);
-                if (stored != null && !stored.isEmpty()) {
-                    player.giveItemStack(stored);
-                } else {
-                    // Fallback: at least return the plain item
-                    player.giveItemStack(new ItemStack(current));
+                ItemStack toReturn = (stored != null && !stored.isEmpty()) ? stored : new ItemStack(current);
+
+                var inventory = player.getInventory();
+                int selectedSlot = inventory.getSelectedSlot();
+                boolean placedInSelected = false;
+
+                if (selectedSlot >= 0 && selectedSlot < PlayerInventory.getHotbarSize()) {
+                    ItemStack currentlySelected = inventory.getStack(selectedSlot);
+                    if (currentlySelected.isEmpty()) {
+                        inventory.setStack(selectedSlot, toReturn);
+                        placedInSelected = true;
+                    } else {
+                        // Try to relocate the existing stack elsewhere before placing the lantern
+                        ItemStack displaced = currentlySelected.copy();
+                        inventory.setStack(selectedSlot, ItemStack.EMPTY);
+                        boolean inserted = inventory.insertStack(displaced);
+                        if (!inserted && !displaced.isEmpty()) {
+                            player.dropItem(displaced, true);
+                        }
+                        inventory.setStack(selectedSlot, toReturn);
+                        placedInSelected = true;
+                    }
                 }
+
+                if (!placedInSelected) {
+                    // Fallback in case the selected slot index is invalid for some reason
+                    if (!inventory.insertStack(toReturn)) {
+                        player.dropItem(toReturn, false);
+                    }
+                }
+
+                inventory.markDirty();
             }
             // Clear state and persistence
             BeltState.setLamp(player, (ItemStack) null);
