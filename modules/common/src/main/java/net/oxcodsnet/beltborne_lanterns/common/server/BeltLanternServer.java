@@ -60,12 +60,11 @@ public final class BeltLanternServer {
                     } else {
                         // Try to relocate the existing stack elsewhere before placing the lantern
                         ItemStack displaced = currentlySelected.copy();
-                        inventory.setStack(selectedSlot, ItemStack.EMPTY);
+                        inventory.setStack(selectedSlot, toReturn);
                         boolean inserted = inventory.insertStack(displaced);
                         if (!inserted && !displaced.isEmpty()) {
                             player.dropItem(displaced, true);
                         }
-                        inventory.setStack(selectedSlot, toReturn);
                         placedInSelected = true;
                     }
                 }

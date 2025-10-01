@@ -1,4 +1,3 @@
 ## Changelog
-### ✨ Improvements
-- Pressing the lantern key now moves the lantern from the belt straight into the selected hotbar slot for quick access.
-- Changed LDL support to a new, cleaner method
+### 🐛 Fixes
+- Pulling the lantern into your hand with `B` now relocates the previously held item back into your inventory (or drops it if you're full) instead of deleting it.
