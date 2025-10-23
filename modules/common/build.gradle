@@ -15,7 +15,6 @@ dependencies {
 
     // Optional: LambDynamicLights 4.x API for typed integration (compile-only)
     modCompileOnly("dev.lambdaurora.lambdynamiclights:lambdynamiclights-api:${rootProject.lambdynamiclights_version}")
-
     // Generate Mixin refmap for shared mixins compiled in :common
     annotationProcessor "org.spongepowered:mixin:0.8.7:processor"
 }
