@@ -35,6 +35,11 @@ public final class LambDynLightsInitializer implements DynamicLightsInitializer 
         LambDynLightsCompat.markInitialized();
     }
 
+    @Override
+    public void onInitializeDynamicLights(ItemLightSourceManager itemLightSourceManager) {
+        return;
+    }
+
     private final static class PlayerLanternLuminance implements EntityLuminance {
         static final PlayerLanternLuminance INSTANCE = new PlayerLanternLuminance();
 
