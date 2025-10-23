@@ -1,27 +1,28 @@
 package net.oxcodsnet.beltborne_lanterns.common.network;
 
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Payload for syncing additional lamp luminance settings from server to client.
  */
-public record LampConfigSyncPayload(Map<Identifier, Integer> lamps) implements CustomPayload {
-    public static final Id<LampConfigSyncPayload> ID = new Id<>(Identifier.of(BLMod.MOD_ID, "lamp_config_sync"));
+public record LampConfigSyncPayload(Map<ResourceLocation, Integer> lamps) implements CustomPacketPayload {
+    public static final Type<LampConfigSyncPayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(BLMod.MOD_ID, "lamp_config_sync"));
 
-    public static final PacketCodec<RegistryByteBuf, LampConfigSyncPayload> CODEC = new PacketCodec<>() {
+    public static final StreamCodec<RegistryFriendlyByteBuf, LampConfigSyncPayload> CODEC = new StreamCodec<>() {
         @Override
-        public LampConfigSyncPayload decode(RegistryByteBuf buf) {
+        public LampConfigSyncPayload decode(RegistryFriendlyByteBuf buf) {
             int size = buf.readVarInt();
-            Map<Identifier, Integer> map = new LinkedHashMap<>();
+            Map<ResourceLocation, Integer> map = new LinkedHashMap<>();
             for (int i = 0; i < size; i++) {
-                Identifier id = buf.readIdentifier();
+                ResourceLocation id = buf.readResourceLocation();
                 int lum = buf.readVarInt();
                 map.put(id, lum);
             }
@@ -29,17 +30,17 @@ public record LampConfigSyncPayload(Map<Identifier, Integer> lamps) implements C
         }
 
         @Override
-        public void encode(RegistryByteBuf buf, LampConfigSyncPayload value) {
+        public void encode(RegistryFriendlyByteBuf buf, LampConfigSyncPayload value) {
             buf.writeVarInt(value.lamps().size());
             for (var entry : value.lamps().entrySet()) {
-                buf.writeIdentifier(entry.getKey());
+                buf.writeResourceLocation(entry.getKey());
                 buf.writeVarInt(entry.getValue());
             }
         }
     };
 
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public Type<? extends CustomPacketPayload> type() {
         return ID;
     }
 }

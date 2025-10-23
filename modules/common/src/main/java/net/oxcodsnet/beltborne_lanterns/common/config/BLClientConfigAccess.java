@@ -3,7 +3,7 @@ package net.oxcodsnet.beltborne_lanterns.common.config;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
-import net.minecraft.util.ActionResult;
+import net.minecraft.world.InteractionResult;
 import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
 
 /**
@@ -64,7 +64,7 @@ public final class BLClientConfigAccess {
                 BLLampConfigAccess.save();
                 // Rebuild LampRegistry from updated config
                 LampRegistry.init();
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             });
         }
     }

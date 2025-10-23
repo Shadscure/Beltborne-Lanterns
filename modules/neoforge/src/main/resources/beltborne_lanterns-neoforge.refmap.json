@@ -1,0 +1,14 @@
+{
+  "mappings": {
+    "net/oxcodsnet/beltborne_lanterns/mixin/LivingEntityRendererMixin": {
+      "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V": "Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V"
+    }
+  },
+  "data": {
+    "named:official": {
+      "net/oxcodsnet/beltborne_lanterns/mixin/LivingEntityRendererMixin": {
+        "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V": "Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V"
+      }
+    }
+  }
+}

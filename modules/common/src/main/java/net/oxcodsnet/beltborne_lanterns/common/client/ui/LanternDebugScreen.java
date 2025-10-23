@@ -1,13 +1,13 @@
 package net.oxcodsnet.beltborne_lanterns.common.client.ui;
 
 import me.shedaniel.autoconfig.AutoConfig;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.oxcodsnet.beltborne_lanterns.common.client.BLClientAbstractions;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfig;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfigAccess;
@@ -21,11 +21,11 @@ public class LanternDebugScreen extends Screen {
     private int stepIndex = 1;
     private boolean prevDebugEnabled;
 
-    private TextFieldWidget copyPreviewField;
-    private ButtonWidget stepButton;
+    private EditBox copyPreviewField;
+    private Button stepButton;
 
     public LanternDebugScreen() {
-        super(Text.literal("Lantern Debug"));
+        super(Component.literal("Lantern Debug"));
     }
 
     @Override
@@ -48,62 +48,62 @@ public class LanternDebugScreen extends Screen {
         BLClientConfig cfg = BLClientConfigAccess.get();
 
         // Section: Offset
-        addDrawableChild(ButtonWidget.builder(Text.literal("Offset X-"), b -> { cfg.offsetX100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).dimensions(left, top + row * 22, 74, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("X+"), b -> { cfg.offsetX100 += scaledStep100(); save.run(); refreshCopyPreview(); }).dimensions(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Offset X-"), b -> { cfg.offsetX100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("X+"), b -> { cfg.offsetX100 += scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Offset Y-"), b -> { cfg.offsetY100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).dimensions(left, top + row * 22, 74, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Y+"), b -> { cfg.offsetY100 += scaledStep100(); save.run(); refreshCopyPreview(); }).dimensions(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Offset Y-"), b -> { cfg.offsetY100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Y+"), b -> { cfg.offsetY100 += scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Offset Z-"), b -> { cfg.offsetZ100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).dimensions(left, top + row * 22, 74, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Z+"), b -> { cfg.offsetZ100 += scaledStep100(); save.run(); refreshCopyPreview(); }).dimensions(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Offset Z-"), b -> { cfg.offsetZ100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Z+"), b -> { cfg.offsetZ100 += scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
 
         // Section: Pivot
-        addDrawableChild(ButtonWidget.builder(Text.literal("Pivot X-"), b -> { cfg.pivotX100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).dimensions(left, top + row * 22, 74, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("X+"), b -> { cfg.pivotX100 += scaledStep100(); save.run(); refreshCopyPreview(); }).dimensions(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Pivot X-"), b -> { cfg.pivotX100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("X+"), b -> { cfg.pivotX100 += scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Pivot Y-"), b -> { cfg.pivotY100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).dimensions(left, top + row * 22, 74, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Y+"), b -> { cfg.pivotY100 += scaledStep100(); save.run(); refreshCopyPreview(); }).dimensions(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Pivot Y-"), b -> { cfg.pivotY100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Y+"), b -> { cfg.pivotY100 += scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Pivot Z-"), b -> { cfg.pivotZ100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).dimensions(left, top + row * 22, 74, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Z+"), b -> { cfg.pivotZ100 += scaledStep100(); save.run(); refreshCopyPreview(); }).dimensions(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Pivot Z-"), b -> { cfg.pivotZ100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Z+"), b -> { cfg.pivotZ100 += scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
 
         // Section: Rotation
-        addDrawableChild(ButtonWidget.builder(Text.literal("Rot X-"), b -> { cfg.rotXDeg -= scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).dimensions(left, top + row * 22, 74, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("X+"), b -> { cfg.rotXDeg += scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).dimensions(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Rot X-"), b -> { cfg.rotXDeg -= scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("X+"), b -> { cfg.rotXDeg += scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Rot Y-"), b -> { cfg.rotYDeg -= scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).dimensions(left, top + row * 22, 74, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Y+"), b -> { cfg.rotYDeg += scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).dimensions(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Rot Y-"), b -> { cfg.rotYDeg -= scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Y+"), b -> { cfg.rotYDeg += scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Rot Z-"), b -> { cfg.rotZDeg -= scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).dimensions(left, top + row * 22, 74, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Z+"), b -> { cfg.rotZDeg += scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).dimensions(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Rot Z-"), b -> { cfg.rotZDeg -= scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Z+"), b -> { cfg.rotZDeg += scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
 
         // Section (right): Scale + Step
-        addDrawableChild(ButtonWidget.builder(Text.literal("Scale -"), b -> {
+        addRenderableWidget(Button.builder(Component.literal("Scale -"), b -> {
             cfg.scale100 = Math.max(1, cfg.scale100 - scaledStep100());
             save.run();
             refreshCopyPreview();
-        }).dimensions(rightX, top + rightRow * 22, 70, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Scale +"), b -> {
+        }).bounds(rightX, top + rightRow * 22, 70, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Scale +"), b -> {
             cfg.scale100 += scaledStep100();
             save.run();
             refreshCopyPreview();
-        }).dimensions(rightX + 74, top + rightRow * 22, 70, 20).build());
-        stepButton = addDrawableChild(ButtonWidget.builder(Text.literal("Step: " + stepText()), b -> {
+        }).bounds(rightX + 74, top + rightRow * 22, 70, 20).build());
+        stepButton = addRenderableWidget(Button.builder(Component.literal("Step: " + stepText()), b -> {
             cycleStep();
-            stepButton.setMessage(Text.literal("Step: " + stepText()));
-        }).dimensions(rightX + 148, top + rightRow * 22, 90, 20).build());
+            stepButton.setMessage(Component.literal("Step: " + stepText()));
+        }).bounds(rightX + 148, top + rightRow * 22, 90, 20).build());
         rightRow++;
 
         // Section (right): Copy preview & button
         int previewWidth = 180;
-        copyPreviewField = new TextFieldWidget(this.textRenderer, rightX, top + rightRow * 22, previewWidth, 20, Text.literal("CopyPreview"));
+        copyPreviewField = new EditBox(this.font, rightX, top + rightRow * 22, previewWidth, 20, Component.literal("CopyPreview"));
         copyPreviewField.setEditable(false);
-        addDrawableChild(copyPreviewField);
-        addDrawableChild(ButtonWidget.builder(Text.literal("Copy"), b -> copyValuesToClipboard())
-                .dimensions(rightX + previewWidth + 4, top + rightRow * 22, rightColWidth - previewWidth - 4, 20)
+        addRenderableWidget(copyPreviewField);
+        addRenderableWidget(Button.builder(Component.literal("Copy"), b -> copyValuesToClipboard())
+                .bounds(rightX + previewWidth + 4, top + rightRow * 22, rightColWidth - previewWidth - 4, 20)
                 .build());
         refreshCopyPreview();
     }
@@ -137,20 +137,20 @@ public class LanternDebugScreen extends Screen {
         BLClientConfig c = BLClientConfigAccess.get();
         String s = String.format("off(%.3f,%.3f,%.3f) piv(%.3f,%.3f,%.3f) rot(%d,%d,%d) sc(%.3f)",
                 c.fOffsetX(), c.fOffsetY(), c.fOffsetZ(), c.fPivotX(), c.fPivotY(), c.fPivotZ(), c.rotXDeg, c.rotYDeg, c.rotZDeg, c.fScale());
-        if (copyPreviewField != null) copyPreviewField.setText(s);
+        if (copyPreviewField != null) copyPreviewField.setValue(s);
     }
 
     private void copyValuesToClipboard() {
         BLClientConfig c = BLClientConfigAccess.get();
         String jsonish = String.format("{offset:[%.3f,%.3f,%.3f], pivot:[%.3f,%.3f,%.3f], rot:[%d,%d,%d], scale:%.3f}",
                 c.fOffsetX(), c.fOffsetY(), c.fOffsetZ(), c.fPivotX(), c.fPivotY(), c.fPivotZ(), c.rotXDeg, c.rotYDeg, c.rotZDeg, c.fScale());
-        MinecraftClient.getInstance().keyboard.setClipboard(jsonish);
+        Minecraft.getInstance().keyboardHandler.setClipboard(jsonish);
     }
 
     @Override
-    public void close() {
+    public void onClose() {
         BLClientAbstractions.setDebugDrawEnabled(prevDebugEnabled);
-        super.close();
+        super.onClose();
     }
 
     @Override
@@ -189,29 +189,29 @@ public class LanternDebugScreen extends Screen {
     }
 
     @Override
-    protected void applyBlur() {
+    protected void renderBlurredBackground() {
         // keep world visible
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
         BLClientConfig c = BLClientConfigAccess.get();
         int x = 20;
         int y = 10;
-        ctx.drawText(this.textRenderer, Text.literal("Lantern Debug (hold Shift=×10, Ctrl=×0.1)" ).formatted(Formatting.YELLOW), x, y, 0xFFFFFF, false);
+        ctx.drawString(this.font, Component.literal("Lantern Debug (hold Shift=×10, Ctrl=×0.1)" ).withStyle(ChatFormatting.YELLOW), x, y, 0xFFFFFF, false);
         y += 14;
-        ctx.drawText(this.textRenderer, Text.literal(String.format("Offset: X=%.3f Y=%.3f Z=%.3f", c.fOffsetX(), c.fOffsetY(), c.fOffsetZ())), x, y, 0xFFFFFF, false);
+        ctx.drawString(this.font, Component.literal(String.format("Offset: X=%.3f Y=%.3f Z=%.3f", c.fOffsetX(), c.fOffsetY(), c.fOffsetZ())), x, y, 0xFFFFFF, false);
         y += 12;
-        ctx.drawText(this.textRenderer, Text.literal(String.format("Pivot:  X=%.3f Y=%.3f Z=%.3f", c.fPivotX(), c.fPivotY(), c.fPivotZ())), x, y, 0xFFFFFF, false);
+        ctx.drawString(this.font, Component.literal(String.format("Pivot:  X=%.3f Y=%.3f Z=%.3f", c.fPivotX(), c.fPivotY(), c.fPivotZ())), x, y, 0xFFFFFF, false);
         y += 12;
-        ctx.drawText(this.textRenderer, Text.literal(String.format("Rot:    X=%d Y=%d Z=%d", c.rotXDeg, c.rotYDeg, c.rotZDeg)), x, y, 0xFFFFFF, false);
+        ctx.drawString(this.font, Component.literal(String.format("Rot:    X=%d Y=%d Z=%d", c.rotXDeg, c.rotYDeg, c.rotZDeg)), x, y, 0xFFFFFF, false);
         y += 12;
-        ctx.drawText(this.textRenderer, Text.literal(String.format("Scale:  %.3f", c.fScale())), x, y, 0xFFFFFF, false);
+        ctx.drawString(this.font, Component.literal(String.format("Scale:  %.3f", c.fScale())), x, y, 0xFFFFFF, false);
     }
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 }

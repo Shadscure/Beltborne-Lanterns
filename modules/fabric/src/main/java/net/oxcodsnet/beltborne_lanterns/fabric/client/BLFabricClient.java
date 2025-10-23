@@ -10,12 +10,12 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.oxcodsnet.beltborne_lanterns.common.LambDynLightsCompat;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.oxcodsnet.beltborne_lanterns.common.network.BeltSyncPayload;
 import net.oxcodsnet.beltborne_lanterns.common.network.ToggleLanternPayload;
 import net.oxcodsnet.beltborne_lanterns.common.client.BLClientAbstractions;
@@ -28,18 +28,15 @@ import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
 import net.oxcodsnet.beltborne_lanterns.common.network.LampConfigSyncPayload;
 import net.oxcodsnet.beltborne_lanterns.common.physics.LanternSwingManager;
 import org.lwjgl.glfw.GLFW;
-
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-
+import com.mojang.blaze3d.platform.InputConstants;
 import java.util.UUID;
 
 public final class BLFabricClient implements ClientModInitializer {
     // Keybindings
-    private static KeyBinding openConfigKey;
-    private static KeyBinding toggleDebugKey;
-    private static KeyBinding openDebugEditorKey;
-    private static KeyBinding toggleLanternKey;
+    private static KeyMapping openConfigKey;
+    private static KeyMapping toggleDebugKey;
+    private static KeyMapping openDebugEditorKey;
+    private static KeyMapping toggleLanternKey;
 
     @Override
     public void onInitializeClient() {
@@ -50,16 +47,16 @@ public final class BLFabricClient implements ClientModInitializer {
 
         // Rebuild registry after client joins a server (tags/registries are synced at this point)
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            client.execute(() -> {
-                // Reset client-side caches to avoid stale state between worlds
+            client.execute(()->{
                 ClientBeltPlayers.clear();
                 LanternSwingManager.clearAll();
                 LampRegistry.init();
             });
         });
+
         // Clear caches on disconnect as well
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
-            MinecraftClient.getInstance().execute(() -> {
+            Minecraft.getInstance().execute(() -> {
                 ClientBeltPlayers.clear();
                 LanternSwingManager.clearAll();
             });
@@ -68,15 +65,15 @@ public final class BLFabricClient implements ClientModInitializer {
         // Register network receiver: updates local client set
         ClientPlayNetworking.registerGlobalReceiver(BeltSyncPayload.ID, (payload, context) -> {
             UUID uuid = payload.playerUuid();
-            Item lamp = payload.lampId() != null ? Registries.ITEM.get(payload.lampId()) : null;
-            MinecraftClient.getInstance().execute(() -> {
+            Item lamp = payload.lampId() != null ? BuiltInRegistries.ITEM.getValue(payload.lampId()) : null;
+            Minecraft.getInstance().execute(() -> {
                 ClientBeltPlayers.setLamp(uuid, lamp);
             });
         });
 
         // This receiver handles lamp configs sent from a dedicated server.
         ClientPlayNetworking.registerGlobalReceiver(LampConfigSyncPayload.ID, (payload, context) -> {
-            MinecraftClient client = MinecraftClient.getInstance();
+            Minecraft client = Minecraft.getInstance();
             client.execute(() -> {
                 var cliCfg = BLClientConfigAccess.get();
                 cliCfg.extraLampLight.clear();
@@ -99,40 +96,39 @@ public final class BLFabricClient implements ClientModInitializer {
 
         // Clean up swing manager state when a player entity is unloaded
         ClientEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
-            if (entity instanceof PlayerEntity) {
-                LanternSwingManager.removePlayer(entity.getUuid());
+            if (entity instanceof Player) {
+                LanternSwingManager.removePlayer(entity.getUUID());
             }
         });
 
         // Optionally register dynamic lights for the belt lantern when LambDynamicLights is present
         boolean hasLamb = FabricLoader.getInstance().isModLoaded("lambdynlights");
-        if (hasLamb) LambDynLightsCompat.init();
 
         // Keybind to open config (default: L)
-        openConfigKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        openConfigKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.beltborne_lanterns.open_config",
-                InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_L,
+                InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_L,
                 "category.beltborne_lanterns"
         ));
 
         // Keybind to toggle debug gizmos (default: K)
-        toggleDebugKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        toggleDebugKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.beltborne_lanterns.toggle_debug",
-                InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_K,
+                InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K,
                 "category.beltborne_lanterns"
         ));
 
         // Keybind to open lantern debug editor (default: P)
-        openDebugEditorKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        openDebugEditorKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.beltborne_lanterns.open_debug",
-                InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_P,
+                InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_P,
                 "category.beltborne_lanterns"
         ));
 
         // Keybind to toggle belt lantern (default: B)
-        toggleLanternKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        toggleLanternKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.beltborne_lanterns.toggle_lantern",
-                InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_B,
+                InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B,
                 "category.beltborne_lanterns"
         ));
 
@@ -140,27 +136,27 @@ public final class BLFabricClient implements ClientModInitializer {
         BLClientAbstractions.init(ClientBeltPlayers::getLamp);
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (openConfigKey.wasPressed()) {
-                if (client.currentScreen == null) {
-                    client.setScreen(LanternClientScreens.openConfig(client.currentScreen));
+            if (openConfigKey.consumeClick()) {
+                if (client.screen == null) {
+                    client.setScreen(LanternClientScreens.openConfig(client.screen));
                 }
             }
 
-            if (toggleDebugKey.wasPressed()) {
+            if (toggleDebugKey.consumeClick()) {
                 if (net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfigAccess.get().debug) {
                     BLClientAbstractions.setDebugDrawEnabled(!BLClientAbstractions.isDebugDrawEnabled());
                 }
             }
 
-            if (openDebugEditorKey.wasPressed()) {
+            if (openDebugEditorKey.consumeClick()) {
                 if (net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfigAccess.get().debug) {
-                    if (client.currentScreen == null) {
+                    if (client.screen == null) {
                         client.setScreen(new net.oxcodsnet.beltborne_lanterns.common.client.ui.LanternDebugScreen());
                     }
                 }
             }
 
-            if (toggleLanternKey.wasPressed()) {
+            if (toggleLanternKey.consumeClick()) {
                 ClientPlayNetworking.send(new ToggleLanternPayload());
             }
 
