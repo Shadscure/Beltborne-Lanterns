@@ -55,6 +55,8 @@ Need it back in your hands? Press **B** again. 💡
 
 > *Dynamic lighting note:* the in‑world light effect requires a dynamic lighting mod — see FAQ.
 
+## ⧉ Add-ons
+ - **Beltborne Lanterns - Accessories Layer**:  [Modrinth](https://modrinth.com/mod/beltborne-lanterns-accessories-layer) / [Curseforge](https://www.curseforge.com/minecraft/mc-mods/beltborne-lanterns) / [Github](https://github.com/Shadscure/Beltborne-Lanterns)
 
 ## 📷 Showcase
 
