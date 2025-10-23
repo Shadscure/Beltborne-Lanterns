@@ -49,7 +49,7 @@ public final class BeltLanternServer {
                 ItemStack toReturn = (stored != null && !stored.isEmpty()) ? stored : new ItemStack(current);
 
                 var inventory = player.getInventory();
-                int selectedSlot = inventory.getSelectedSlot();
+                int selectedSlot = inventory.getFreeSlot();
                 boolean placedInSelected = false;
 
                 if (selectedSlot >= 0 && selectedSlot < Inventory.getSelectionSize()) {
