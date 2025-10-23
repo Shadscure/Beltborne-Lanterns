@@ -1,16 +1,16 @@
 package net.oxcodsnet.beltborne_lanterns.fabric.compat;
 
+import Type;
 import dev.lambdaurora.lambdynlights.api.DynamicLightsContext;
 import dev.lambdaurora.lambdynlights.api.DynamicLightsInitializer;
 import dev.lambdaurora.lambdynlights.api.entity.EntityLightSourceManager;
 import dev.lambdaurora.lambdynlights.api.entity.luminance.EntityLuminance;
 import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import dev.yumi.commons.event.Event;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.oxcodsnet.beltborne_lanterns.common.LambDynLightsCompat;
 import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
@@ -24,7 +24,7 @@ public final class LDL4FabricInitializer implements DynamicLightsInitializer {
     public void onInitializeDynamicLights(DynamicLightsContext context) {
         EntityLightSourceManager mgr = context.entityLightSourceManager();
         Event event = mgr.onRegisterEvent();
-        Identifier id = Identifier.of(BLMod.MOD_ID, "player_lantern");
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(BLMod.MOD_ID, "player_lantern");
 
         EntityLuminance luminance = new EntityLuminance() {
             @Override
@@ -32,7 +32,7 @@ public final class LDL4FabricInitializer implements DynamicLightsInitializer {
 
             @Override
             public int getLuminance(ItemLightSourceManager items, Entity entity) {
-                if (entity instanceof PlayerEntity player) {
+                if (entity instanceof Player player) {
                     Item lamp = BLClientAbstractions.clientLamp(player);
                     return lamp != null ? LampRegistry.getLuminance(lamp) : 0;
                 }

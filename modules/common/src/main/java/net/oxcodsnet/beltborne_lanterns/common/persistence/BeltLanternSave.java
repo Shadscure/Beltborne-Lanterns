@@ -1,16 +1,19 @@
 package net.oxcodsnet.beltborne_lanterns.common.persistence;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderLookup.Provider;
+import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.PersistentState;
-import net.minecraft.world.PersistentStateType;
-import net.minecraft.registry.RegistryBuilder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Encoder;
 import com.mojang.serialization.Decoder;
@@ -26,35 +29,35 @@ import java.util.UUID;
  * World-persistent storage of which players have the belt lantern equipped.
  * Stores full ItemStack NBT to preserve enchantments, names, etc.
  */
-public final class BeltLanternSave extends PersistentState {
+public final class BeltLanternSave extends SavedData {
     private static final String SAVE_NAME = "beltborne_lanterns_belts";
     private static final String PLAYERS_KEY = "players";
 
     private final Map<UUID, ItemStack> playersWithLamps = new HashMap<>();
 
-    private static final PersistentStateType<BeltLanternSave> TYPE = new PersistentStateType<>(
+    private static final SavedDataType<BeltLanternSave> TYPE = new SavedDataType<>(
             SAVE_NAME,
-            (PersistentState.Context ctx) -> new BeltLanternSave(),
+            (SavedData.Context ctx) -> new BeltLanternSave(),
             BeltLanternSave::codec,
-            (net.minecraft.datafixer.DataFixTypes) null
+            (net.minecraft.util.datafix.DataFixTypes) null
     );
 
-    private static Codec<BeltLanternSave> codec(PersistentState.Context ctx) {
+    private static Codec<BeltLanternSave> codec(SavedData.Context ctx) {
         return Codec.of(new Encoder<>() {
             @Override
             public <T> DataResult<T> encode(BeltLanternSave value, DynamicOps<T> ops, T prefix) {
-                NbtCompound nbt = new NbtCompound();
-                var world = ctx.getWorldOrThrow();
-                var registries = new RegistryBuilder().createWrapperLookup(world.getRegistryManager());
+                CompoundTag nbt = new CompoundTag();
+                var world = ctx.levelOrThrow();
+                var registries = new RegistrySetBuilder().build(world.registryAccess());
                 value.writeNbt(nbt, registries);
-                return NbtCompound.CODEC.encodeStart(ops, nbt);
+                return CompoundTag.CODEC.encodeStart(ops, nbt);
             }
         }, new Decoder<>() {
             @Override
             public <T> DataResult<Pair<BeltLanternSave, T>> decode(DynamicOps<T> ops, T input) {
-                return NbtCompound.CODEC.parse(ops, input).map(nbt -> {
-                    var world = ctx.getWorldOrThrow();
-                    var registries = new RegistryBuilder().createWrapperLookup(world.getRegistryManager());
+                return CompoundTag.CODEC.parse(ops, input).map(nbt -> {
+                    var world = ctx.levelOrThrow();
+                    var registries = new RegistrySetBuilder().build(world.registryAccess());
                     return Pair.of(BeltLanternSave.fromNbt(nbt, registries), input);
                 });
             }
@@ -62,13 +65,13 @@ public final class BeltLanternSave extends PersistentState {
     }
 
     public static BeltLanternSave get(MinecraftServer server) {
-        var psManager = server.getOverworld().getPersistentStateManager();
-        return (BeltLanternSave) psManager.getOrCreate(TYPE);
+        var psManager = server.overworld().getDataStorage();
+        return (BeltLanternSave) psManager.computeIfAbsent(TYPE);
     }
 
     public BeltLanternSave() {}
 
-    public BeltLanternSave(PersistentState.Context ctx) {}
+    public BeltLanternSave(SavedData.Context ctx) {}
 
     public boolean has(UUID uuid) {
         return playersWithLamps.containsKey(uuid);
@@ -99,7 +102,7 @@ public final class BeltLanternSave extends PersistentState {
         } else {
             playersWithLamps.remove(uuid);
         }
-        markDirty();
+        setDirty();
     }
 
     /**
@@ -111,20 +114,20 @@ public final class BeltLanternSave extends PersistentState {
         } else {
             playersWithLamps.remove(uuid);
         }
-        markDirty();
+        setDirty();
     }
 
-    public static BeltLanternSave fromNbt(NbtCompound nbt) {
+    public static BeltLanternSave fromNbt(CompoundTag nbt) {
         // Fallback path (legacy) – will not decode full stacks due to missing registry lookup
         BeltLanternSave save = new BeltLanternSave();
-        NbtCompound map = nbt.getCompoundOrEmpty(PLAYERS_KEY);
-        for (String key : map.getKeys()) {
+        CompoundTag map = nbt.getCompoundOrEmpty(PLAYERS_KEY);
+        for (String key : map.keySet()) {
             try {
                 UUID uuid = UUID.fromString(key);
                 map.getString(key).ifPresent(str -> {
-                    Identifier id = Identifier.tryParse(str);
+                    ResourceLocation id = ResourceLocation.tryParse(str);
                     if (id != null) {
-                        save.playersWithLamps.put(uuid, new ItemStack(net.minecraft.registry.Registries.ITEM.get(id)));
+                        save.playersWithLamps.put(uuid, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(id)));
                     }
                 });
             } catch (IllegalArgumentException ignored) {}
@@ -132,23 +135,23 @@ public final class BeltLanternSave extends PersistentState {
         return save;
     }
 
-    public static BeltLanternSave fromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+    public static BeltLanternSave fromNbt(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         BeltLanternSave save = new BeltLanternSave();
-        NbtCompound map = nbt.getCompoundOrEmpty(PLAYERS_KEY);
-        for (String key : map.getKeys()) {
+        CompoundTag map = nbt.getCompoundOrEmpty(PLAYERS_KEY);
+        for (String key : map.keySet()) {
             try {
                 UUID uuid = UUID.fromString(key);
-                NbtElement el = map.get(key);
-                if (el != null && !(el instanceof NbtString)) { // new format: full encoded stack
-                    ItemStack stack = ItemStack.fromNbt(registryLookup, el).orElse(ItemStack.EMPTY);
+                Tag el = map.get(key);
+                if (el != null && !(el instanceof StringTag)) { // new format: full encoded stack
+                    ItemStack stack = ItemStack.parse(registryLookup, el).orElse(ItemStack.EMPTY);
                     if (!stack.isEmpty()) {
                         save.playersWithLamps.put(uuid, stack);
                     }
                 } else {
                     map.getString(key).ifPresent(str -> {
-                        Identifier id = Identifier.tryParse(str);
+                        ResourceLocation id = ResourceLocation.tryParse(str);
                         if (id != null) {
-                            save.playersWithLamps.put(uuid, new ItemStack(net.minecraft.registry.Registries.ITEM.get(id)));
+                            save.playersWithLamps.put(uuid, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(id)));
                         }
                     });
                 }
@@ -157,10 +160,10 @@ public final class BeltLanternSave extends PersistentState {
         return save;
     }
 
-    public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        NbtCompound map = new NbtCompound();
+    public CompoundTag writeNbt(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        CompoundTag map = new CompoundTag();
         for (Map.Entry<UUID, ItemStack> e : playersWithLamps.entrySet()) {
-            NbtElement encoded = e.getValue().toNbt(registryLookup);
+            Tag encoded = e.getValue().save(registryLookup);
             map.put(e.getKey().toString(), encoded);
         }
         nbt.put(PLAYERS_KEY, map);
