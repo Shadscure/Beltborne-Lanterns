@@ -1,13 +1,13 @@
 package net.oxcodsnet.beltborne_lanterns.mixin;
 
-import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.oxcodsnet.beltborne_lanterns.common.client.RenderStatePlayerUuidAccess;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.UUID;
 
-@Mixin(PlayerEntityRenderState.class)
+@Mixin(PlayerRenderState.class)
 public class PlayerEntityRenderStateAccessorMixin implements RenderStatePlayerUuidAccess {
     @Unique
     private UUID bl$playerUuid;

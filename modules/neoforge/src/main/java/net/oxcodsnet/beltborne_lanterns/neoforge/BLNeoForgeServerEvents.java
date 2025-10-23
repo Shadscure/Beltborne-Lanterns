@@ -1,19 +1,24 @@
 package net.oxcodsnet.beltborne_lanterns.neoforge;
 
-import net.minecraft.item.Item;
+import java.util.LinkedHashMap;
+import java.util.Optional;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.GameRules;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.oxcodsnet.beltborne_lanterns.common.BeltState;
 import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
+import net.oxcodsnet.beltborne_lanterns.common.compat.CompatibilityLayer;
 import net.oxcodsnet.beltborne_lanterns.common.compat.CompatibilityLayerRegistry;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLLampConfigAccess;
 import net.oxcodsnet.beltborne_lanterns.common.persistence.BeltLanternSave;
@@ -38,7 +43,7 @@ public final class BLNeoForgeServerEvents {
         boolean dpChanged = net.oxcodsnet.beltborne_lanterns.common.datapack.BLRuntimeDataPack.writeOrUpdate(server);
         if (dpChanged) {
             try {
-                server.getCommandManager().executeWithPrefix(server.getCommandSource(), "reload");
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "reload");
             } catch (Throwable t) {
                 net.oxcodsnet.beltborne_lanterns.BLMod.LOGGER.info("Runtime datapack updated — please run /reload to apply");
             }
@@ -47,10 +52,10 @@ public final class BLNeoForgeServerEvents {
 
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayerEntity joining)) return;
-        MinecraftServer server = joining.server;
+        if (!(event.getEntity() instanceof ServerPlayer joining)) return;
+        MinecraftServer server = joining.getServer();
         // Restore from persistent save (full stack with NBT) and broadcast
-        var persistedStack = BeltLanternSave.get(server).getStack(joining.getUuid());
+        var persistedStack = BeltLanternSave.get(server).getStack(joining.getUUID());
 
         // If a compatibility layer has a belt stack, prefer that as source of truth
         for (var layer : CompatibilityLayerRegistry.getLayers()) {
@@ -70,37 +75,37 @@ public final class BLNeoForgeServerEvents {
         }
         // If on a dedicated server, send its lamp config to the joining player.
         // In single player, the client's config is trusted as the source of truth.
-        if (server.isDedicated()) {
-            var lampMap = new java.util.LinkedHashMap<Identifier, Integer>();
+        if (server.isDedicatedServer()) {
+            var lampMap = new java.util.LinkedHashMap<ResourceLocation, Integer>();
             BLLampConfigAccess.get().extraLampLight.forEach(entry -> {
-                Identifier id = Identifier.tryParse(entry.id);
+                ResourceLocation id = ResourceLocation.tryParse(entry.id);
                 if (id != null) lampMap.put(id, entry.luminance);
             });
             PacketDistributor.sendToPlayer(joining, new LampConfigSyncPayload(lampMap));
         }
-        for (ServerPlayerEntity other : server.getPlayerManager().getPlayerList()) {
+        for (ServerPlayer other : server.getPlayerList().getPlayers()) {
             Item lamp = BeltState.getLamp(other);
-            BeltNetworking.sendTo(joining, other.getUuid(), lamp);
+            BeltNetworking.sendTo(joining, other.getUUID(), lamp);
         }
 
     }
 
     @SubscribeEvent
     public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayerEntity leaving)) return;
+        if (!(event.getEntity() instanceof ServerPlayer leaving)) return;
         // Persist full stack with NBT on disconnect
-        BeltLanternSave.get(leaving.server).set(leaving.getUuid(), BeltState.getLampStack(leaving));
+        BeltLanternSave.get(leaving.getServer()).set(leaving.getUUID(), BeltState.getLampStack(leaving));
         // Clean up dynamic light source when leaving
         DynamicLightsCompat.removeFor(leaving);
     }
 
     @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
-        if (!(event.getOriginal() instanceof ServerPlayerEntity oldPlayer)) return;
+        if (!(event.getOriginal() instanceof ServerPlayer oldPlayer)) return;
         if (!event.isWasDeath()) return;
 
-        ServerPlayerEntity newPlayer = (ServerPlayerEntity) event.getEntity();
-        boolean keep = oldPlayer.getServerWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
+        ServerPlayer newPlayer = (ServerPlayer) event.getEntity();
+        boolean keep = oldPlayer.serverLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
         BeltLanternServer.handleDeath(oldPlayer, newPlayer, keep);
         // Remove dynamic light from the dying player entity
         DynamicLightsCompat.removeFor(oldPlayer);
@@ -108,7 +113,7 @@ public final class BLNeoForgeServerEvents {
 
     @SubscribeEvent
     public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayerEntity player)) return;
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
         Item lamp = BeltState.getLamp(player);
         BeltNetworking.broadcastBeltState(player, lamp);
         if (lamp != null) {

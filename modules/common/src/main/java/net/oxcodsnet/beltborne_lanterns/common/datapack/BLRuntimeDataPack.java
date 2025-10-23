@@ -1,8 +1,8 @@
 package net.oxcodsnet.beltborne_lanterns.common.datapack;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.WorldSavePath;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.level.storage.LevelResource;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfig;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLLampConfigAccess;
@@ -27,7 +27,7 @@ public final class BLRuntimeDataPack {
 
     public static boolean writeOrUpdate(MinecraftServer server) {
         try {
-            Path datapacksDir = server.getSavePath(WorldSavePath.DATAPACKS);
+            Path datapacksDir = server.getWorldPath(LevelResource.DATAPACK_DIR);
             Path packDir = datapacksDir.resolve(PACK_FOLDER);
             Path meta = packDir.resolve("pack.mcmeta");
             Path lampsTag = packDir.resolve("data/beltborne_lanterns/tags/item/lamps.json");
@@ -36,7 +36,7 @@ public final class BLRuntimeDataPack {
             Set<String> values = new LinkedHashSet<>();
             for (BLClientConfig.ExtraLampEntry e : BLLampConfigAccess.get().extraLampLight) {
                 if (e == null || e.id == null) continue;
-                Identifier id = Identifier.tryParse(e.id);
+                ResourceLocation id = ResourceLocation.tryParse(e.id);
                 if (id == null) continue;
                 values.add(id.toString());
             }
