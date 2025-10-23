@@ -1,12 +1,11 @@
 package net.oxcodsnet.beltborne_lanterns.common;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Runtime-only per-player state: which lamp (with NBT) is
@@ -21,8 +20,8 @@ public final class BeltState {
         return PLAYER_LAMPS.containsKey(uuid);
     }
 
-    public static boolean hasLamp(PlayerEntity player) {
-        return hasLamp(player.getUuid());
+    public static boolean hasLamp(Player player) {
+        return hasLamp(player.getUUID());
     }
 
     /**
@@ -37,8 +36,8 @@ public final class BeltState {
     /**
      * Returns the lamp item type currently equipped, or null.
      */
-    public static Item getLamp(PlayerEntity player) {
-        return getLamp(player.getUuid());
+    public static Item getLamp(Player player) {
+        return getLamp(player.getUUID());
     }
 
     /**
@@ -49,8 +48,8 @@ public final class BeltState {
         return stack != null ? stack.copy() : null;
     }
 
-    public static ItemStack getLampStack(PlayerEntity player) {
-        return getLampStack(player.getUuid());
+    public static ItemStack getLampStack(Player player) {
+        return getLampStack(player.getUUID());
     }
 
     /**
@@ -64,8 +63,8 @@ public final class BeltState {
         }
     }
 
-    public static void setLamp(PlayerEntity player, ItemStack lamp) {
-        setLamp(player.getUuid(), lamp);
+    public static void setLamp(Player player, ItemStack lamp) {
+        setLamp(player.getUUID(), lamp);
     }
 
     /**
@@ -79,8 +78,8 @@ public final class BeltState {
         }
     }
 
-    public static void setLamp(PlayerEntity player, Item lamp) {
-        setLamp(player.getUuid(), lamp);
+    public static void setLamp(Player player, Item lamp) {
+        setLamp(player.getUUID(), lamp);
     }
 }
 
