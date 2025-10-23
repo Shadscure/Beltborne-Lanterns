@@ -46,6 +46,8 @@ dependencies {
     modCompileOnly "com.terraformersmc:modmenu:${rootProject.modmenu_version}"
     modRuntimeOnly "com.terraformersmc:modmenu:${rootProject.modmenu_version}"
 
+    //LDL
+    modLocalRuntime("dev.lambdaurora.lambdynamiclights:lambdynamiclights-runtime:${rootProject.lambdynamiclights_version}+${rootProject.minecraft_version}")
 
     common(project(path: ':modules:common', configuration: 'namedElements')) { transitive = false }
     shadowBundle project(path: ':modules:common', configuration: 'transformProductionFabric')

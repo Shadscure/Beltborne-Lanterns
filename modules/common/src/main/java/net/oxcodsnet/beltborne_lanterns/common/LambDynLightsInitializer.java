@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.oxcodsnet.beltborne_lanterns.common.client.BLClientAbstractions;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Entrypoint for LambDynamicLights 4.x API.
@@ -43,7 +44,7 @@ public final class LambDynLightsInitializer implements DynamicLightsInitializer 
         }
 
         @Override
-        public int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
+        public int getLuminance(@NotNull ItemLightSourceManager itemLightSourceManager, Entity entity) {
             if (entity instanceof Player player) {
                 Item lamp = BLClientAbstractions.clientLamp(player);
                 return lamp != null ? LampRegistry.getLuminance(lamp) : 0;
