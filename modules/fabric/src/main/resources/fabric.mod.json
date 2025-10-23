@@ -30,7 +30,7 @@
     ]
   },
   "mixins": [
-    "beltborne_lanterns.mixins.json"
+    "beltborne_lanterns.fabric.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
