@@ -1,6 +1,7 @@
 package net.oxcodsnet.beltborne_lanterns.common;
 
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 
 import java.lang.reflect.Method;
@@ -38,9 +39,9 @@ public final class DynamicLightsCompat {
         }
     }
 
-    public static void addFor(ServerPlayerEntity player) {
+    public static void addFor(ServerPlayer player) {
         if (!PRESENT || player == null) return;
-        UUID id = player.getUuid();
+        UUID id = player.getUUID();
         if (ACTIVE.containsKey(id)) return;
 
         Object proxy = Proxy.newProxyInstance(
@@ -55,7 +56,7 @@ public final class DynamicLightsCompat {
                     } else if ("hashCode".equals(name)) {
                         return Integer.valueOf(System.identityHashCode(p));
                     } else if ("toString".equals(name)) {
-                        return "BeltborneDLSource{" + player.getGameProfile().getName() + ":" + player.getUuid() + "}";
+                        return "BeltborneDLSource{" + player.getGameProfile().getName() + ":" + player.getUUID() + "}";
                     }
                     if ("getAttachmentEntity".equals(name)) {
                         return player; // runtime-mapped entity instance
@@ -75,15 +76,14 @@ public final class DynamicLightsCompat {
         }
     }
 
-    public static void removeFor(ServerPlayerEntity player) {
+    public static void removeFor(ServerPlayer player) {
         if (!PRESENT || player == null) return;
-        Object proxy = ACTIVE.remove(player.getUuid());
+        Object proxy = ACTIVE.remove(player.getUUID());
         if (proxy == null) return;
         try {
             removeLightSource.invoke(null, proxy);
         } catch (Throwable t) {
-            BLMod.LOGGER.debug("Failed to remove DynamicLights source for {}", player.getUuid(), t);
+            BLMod.LOGGER.debug("Failed to remove DynamicLights source for {}", player.getUUID(), t);
         }
     }
 }
-

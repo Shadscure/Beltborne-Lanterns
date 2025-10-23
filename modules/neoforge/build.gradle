@@ -38,6 +38,9 @@ dependencies {
     //modImplementation "dev.architectury:architectury-neoforge:$rootProject.architectury_api_version"
     modImplementation "me.shedaniel.cloth:cloth-config-neoforge:${rootProject.cloth_config_version}"
 
+    // LDL
+    modLocalRuntime("dev.lambdaurora.lambdynamiclights:lambdynamiclights-runtime:${rootProject.lambdynamiclights_version}")
+
     common(project(path: ':modules:common', configuration: 'namedElements')) { transitive = false }
     shadowBundle project(path: ':modules:common', configuration: 'transformProductionNeoForge')
 }

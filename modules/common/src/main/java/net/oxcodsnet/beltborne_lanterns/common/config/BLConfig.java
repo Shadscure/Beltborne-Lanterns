@@ -27,3 +27,4 @@ public final class BLConfig {
     public float fPivotZ()  { return pivotZ100 / 1000f; }
     public float fScale()   { return scale100 / 1000f; }
 }
+

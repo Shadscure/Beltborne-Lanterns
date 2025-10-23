@@ -1,19 +1,19 @@
 package net.oxcodsnet.beltborne_lanterns.common;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
+import net.oxcodsnet.beltborne_lanterns.common.config.BLLampConfig;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLLampConfigAccess;
 
 import java.util.Collections;
@@ -29,7 +29,7 @@ public final class LampRegistry {
     private record LampData(BlockState state, int luminance) {}
 
     private static final Map<Item, LampData> LAMPS = new LinkedHashMap<>();
-    public static final TagKey<Item> EXTRA_LAMPS_TAG = TagKey.of(RegistryKeys.ITEM, Identifier.of(BLMod.MOD_ID, "lamps"));
+    public static final TagKey<Item> EXTRA_LAMPS_TAG = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(BLMod.MOD_ID, "lamps"));
 
     private LampRegistry() {}
 
@@ -44,39 +44,45 @@ public final class LampRegistry {
         LAMPS.clear();
 
         // Built-in vanilla lamps
-        register(Items.LANTERN, Blocks.LANTERN.getDefaultState().with(Properties.HANGING, false));
-        register(Items.SOUL_LANTERN, Blocks.SOUL_LANTERN.getDefaultState().with(Properties.HANGING, false));
+        register(Items.LANTERN, Blocks.LANTERN.defaultBlockState().setValue(BlockStateProperties.HANGING, false));
+        register(Items.SOUL_LANTERN, Blocks.SOUL_LANTERN.defaultBlockState().setValue(BlockStateProperties.HANGING, false));
 
-        // Dynamically register any additional tagged items
-        Registries.ITEM.getEntryList(EXTRA_LAMPS_TAG).ifPresent(list -> {
-            // Keep discovery log at debug level to avoid spam
-            BLMod.LOGGER.debug("Found {} entries in #{}:lamps", list.size(), BLMod.MOD_ID);
-            for (RegistryEntry<Item> entry : list) {
-                Identifier id = Registries.ITEM.getId(entry.value());
+        // Dynamically register any additional tagged items (MC 1.21+: iterateEntries)
+        try {
+            int discovered = 0;
+            for (Holder<Item> entry : BuiltInRegistries.ITEM.getTagOrEmpty(EXTRA_LAMPS_TAG)) {
+                discovered++;
+                ResourceLocation id = BuiltInRegistries.ITEM.getKey(entry.value());
                 BLMod.LOGGER.debug(" - {}", id);
                 Item item = entry.value();
                 if (LAMPS.containsKey(item)) continue;
                 if (item instanceof BlockItem blockItem) {
-                    BlockState state = blockItem.getBlock().getDefaultState();
-                    if (state.contains(Properties.HANGING)) {
-                        state = state.with(Properties.HANGING, false);
+                    BlockState state = blockItem.getBlock().defaultBlockState();
+                    if (state.hasProperty(BlockStateProperties.HANGING)) {
+                        state = state.setValue(BlockStateProperties.HANGING, false);
                     }
                     register(item, state);
                 }
             }
-        });
+            if (discovered > 0) {
+                BLMod.LOGGER.debug("Found {} entries in #{}:lamps", discovered, BLMod.MOD_ID);
+            }
+        } catch (IllegalStateException notBound) {
+            // Tags are not yet bound (e.g. very early client init). Skip gracefully.
+            BLMod.LOGGER.debug("Tags not bound yet; skipping tag-based lamps for now");
+        }
 
         // Register additional lamps from config with custom luminance
         var cfg = BLLampConfigAccess.get();
         cfg.extraLampLight.forEach(entry -> {
-            Identifier id = Identifier.tryParse(entry.id);
+            ResourceLocation id = ResourceLocation.tryParse(entry.id);
             if (id == null) return;
-            Item item = Registries.ITEM.get(id);
+            Item item = BuiltInRegistries.ITEM.get(id);
             if (item == Items.AIR) return;
             if (!(item instanceof BlockItem blockItem)) return;
-            BlockState state = blockItem.getBlock().getDefaultState();
-            if (state.contains(Properties.HANGING)) {
-                state = state.with(Properties.HANGING, false);
+            BlockState state = blockItem.getBlock().defaultBlockState();
+            if (state.hasProperty(BlockStateProperties.HANGING)) {
+                state = state.setValue(BlockStateProperties.HANGING, false);
             }
             register(item, state, entry.luminance);
         });
@@ -95,7 +101,7 @@ public final class LampRegistry {
     }
 
     public static void register(Item item, BlockState state) {
-        LAMPS.put(item, new LampData(state, state.getLuminance()));
+        LAMPS.put(item, new LampData(state, state.getLightEmission()));
     }
 
     public static void register(Item item, BlockState state, int luminance) {
@@ -112,7 +118,7 @@ public final class LampRegistry {
 
     public static BlockState getState(Item item) {
         LampData data = LAMPS.get(item);
-        return data != null ? data.state() : Blocks.LANTERN.getDefaultState().with(Properties.HANGING, false);
+        return data != null ? data.state() : Blocks.LANTERN.defaultBlockState().setValue(BlockStateProperties.HANGING, false);
     }
 
     public static int getLuminance(Item item) {
@@ -120,12 +126,12 @@ public final class LampRegistry {
         return data != null ? data.luminance() : 0;
     }
 
-    public static Identifier getId(Item item) {
-        return Registries.ITEM.getId(item);
+    public static ResourceLocation getId(Item item) {
+        return BuiltInRegistries.ITEM.getKey(item);
     }
 
-    public static Item getById(Identifier id) {
-        return Registries.ITEM.get(id);
+    public static Item getById(ResourceLocation id) {
+        return BuiltInRegistries.ITEM.get(id);
     }
 
     public static Set<Item> items() {

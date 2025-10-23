@@ -1,16 +1,18 @@
 package net.oxcodsnet.beltborne_lanterns.neoforge;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.oxcodsnet.beltborne_lanterns.common.BeltState;
 import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
 import net.oxcodsnet.beltborne_lanterns.common.client.ClientBeltPlayers;
+import net.oxcodsnet.beltborne_lanterns.common.compat.CompatibilityLayer;
 import net.oxcodsnet.beltborne_lanterns.common.compat.CompatibilityLayerRegistry;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfig;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfigAccess;
@@ -24,11 +26,12 @@ import java.util.UUID;
 
 
 /**
- * Registers all network payloads on the MOD bus.
+ * Registers server-side network payloads on the MOD bus.
  *
- * <p>Runs on both client and server sides.</p>
+ * <p>Runs on both dedicated and integrated servers so the toggle payload is
+ * handled in singleplayer as well.</p>
  */
-@EventBusSubscriber(modid = BLMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = BLMod.MOD_ID)
 public final class BLNeoForgeNetwork {
     private BLNeoForgeNetwork() {}
 
@@ -39,17 +42,17 @@ public final class BLNeoForgeNetwork {
 
         // C2S Payloads (Client to Server)
         registrar.playToServer(ToggleLanternPayload.ID, ToggleLanternPayload.CODEC, (payload, ctx) -> {
-            ServerPlayerEntity player = (ServerPlayerEntity) ctx.player();
+            ServerPlayer player = (ServerPlayer) ctx.player();
             ctx.enqueueWork(() -> {
                 // Try to toggle lantern via compatibility layers
                 for (var layer : CompatibilityLayerRegistry.getLayers()) {
                     if (layer.tryToggleLantern(player)) return;
                 }
 
-                ItemStack stack = player.getMainHandStack();
+                ItemStack stack = player.getMainHandItem();
                 boolean hasLamp = BeltState.hasLamp(player);
                 if (!hasLamp && !LampRegistry.isLamp(stack)) {
-                    stack = player.getOffHandStack();
+                    stack = player.getOffhandItem();
                     if (!LampRegistry.isLamp(stack)) return;
                 }
                 Item nowHas = BeltLanternServer.toggleLantern(player, stack);
@@ -75,7 +78,7 @@ public final class BLNeoForgeNetwork {
                 BeltSyncPayload.CODEC,
                 (payload, ctx) -> {
                     UUID uuid = payload.playerUuid();
-                    Item lamp = payload.lampId() != null ? Registries.ITEM.get(payload.lampId()) : null;
+                    Item lamp = payload.lampId() != null ? BuiltInRegistries.ITEM.get(payload.lampId()) : null;
                     ClientBeltPlayers.setLamp(uuid, lamp);
                 }
         );
