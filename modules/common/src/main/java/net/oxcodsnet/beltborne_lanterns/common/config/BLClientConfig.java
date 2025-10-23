@@ -40,7 +40,7 @@ public class BLClientConfig implements ConfigData {
     @ConfigEntry.BoundedDiscrete(min = 250, max = 1000)
     public int scale100 = 500; // 0.50
 
-    // TODO: Доделать правильный дефольный конфиг
+
     @ConfigEntry.Category("lamps")
     public java.util.List<ExtraLampEntry> extraLampLight = new java.util.ArrayList<>();
 

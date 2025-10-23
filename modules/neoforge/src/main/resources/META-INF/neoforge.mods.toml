@@ -41,5 +41,5 @@ side = "BOTH"
 #ordering = "AFTER"
 #side = "BOTH"
 
-[[mixins]]
-config = "beltborne_lanterns.mixins.json"
+[modproperties.beltborne_lanterns."yumi:entrypoints"]
+"lambdynlights:initializer" = "net.oxcodsnet.beltborne_lanterns.common.LambDynLightsInitializer"

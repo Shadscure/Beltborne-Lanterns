@@ -1,9 +1,8 @@
 package net.oxcodsnet.beltborne_lanterns.common.compat;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-
 import java.util.Optional;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * An SPI interface for compatibility layers.
@@ -32,7 +31,7 @@ public interface CompatibilityLayer {
      * @param player The player who pressed the key.
      * @return True if the lantern was toggled, false otherwise.
      */
-    default boolean tryToggleLantern(ServerPlayerEntity player) {
+    default boolean tryToggleLantern(ServerPlayer player) {
         return false;
     }
 
@@ -41,7 +40,7 @@ public interface CompatibilityLayer {
      * This method should sync the lantern to the compatibility mod's slot.
      * @param player The player who toggled the lantern on.
      */
-    default void syncToggleOn(ServerPlayerEntity player) {}
+    default void syncToggleOn(ServerPlayer player) {}
 
     /**
      * Called when the player joins the server.
@@ -49,7 +48,7 @@ public interface CompatibilityLayer {
      * @param player The player who joined the server.
      * @return The lantern from the compatibility mod's slot, or an empty optional if there is no lantern.
      */
-    default Optional<ItemStack> getBeltStack(ServerPlayerEntity player) {
+    default Optional<ItemStack> getBeltStack(ServerPlayer player) {
         return Optional.empty();
     }
 }

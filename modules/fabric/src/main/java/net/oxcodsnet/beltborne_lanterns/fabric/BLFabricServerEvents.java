@@ -3,14 +3,15 @@ package net.oxcodsnet.beltborne_lanterns.fabric;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.GameRules;
 import net.oxcodsnet.beltborne_lanterns.common.BeltState;
 import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
+import net.oxcodsnet.beltborne_lanterns.common.compat.CompatibilityLayer;
 import net.oxcodsnet.beltborne_lanterns.common.compat.CompatibilityLayerRegistry;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLLampConfigAccess;
 import net.oxcodsnet.beltborne_lanterns.common.network.LampConfigSyncPayload;
@@ -19,6 +20,7 @@ import net.oxcodsnet.beltborne_lanterns.common.persistence.BeltLanternSave;
 import net.oxcodsnet.beltborne_lanterns.common.server.BeltLanternServer;
 
 import java.util.LinkedHashMap;
+import java.util.Optional;
 
 /**
  * Handles all server-side event registrations for Fabric.
@@ -29,17 +31,17 @@ public final class BLFabricServerEvents {
     public static void initialize() {
         // Handle client toggle requests
         ServerPlayNetworking.registerGlobalReceiver(ToggleLanternPayload.ID, (payload, context) -> {
-            ServerPlayerEntity player = context.player();
+            ServerPlayer player = context.player();
             context.server().execute(() -> {
                 // Try to toggle lantern via compatibility layers
                 for (var layer : CompatibilityLayerRegistry.getLayers()) {
                     if (layer.tryToggleLantern(player)) return;
                 }
 
-                ItemStack stack = player.getMainHandStack();
+                ItemStack stack = player.getMainHandItem();
                 boolean hasLamp = BeltState.hasLamp(player);
                 if (!hasLamp && !LampRegistry.isLamp(stack)) {
-                    stack = player.getOffHandStack();
+                    stack = player.getOffhandItem();
                     if (!LampRegistry.isLamp(stack)) return;
                 }
                 Item nowHas = BeltLanternServer.toggleLantern(player, stack);
@@ -55,9 +57,9 @@ public final class BLFabricServerEvents {
 
         // When a player joins, sync known belt states of all players to them and restore theirs
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            ServerPlayerEntity joining = handler.getPlayer();
+            ServerPlayer joining = handler.getPlayer();
             // Restore from persistent save (full stack with NBT)
-            var persistedStack = BeltLanternSave.get(server).getStack(joining.getUuid());
+            var persistedStack = BeltLanternSave.get(server).getStack(joining.getUUID());
 
             // If a compatibility layer has a belt stack, prefer that as source of truth
             for (var layer : CompatibilityLayerRegistry.getLayers()) {
@@ -74,34 +76,34 @@ public final class BLFabricServerEvents {
             BeltNetworking.broadcastBeltState(joining, persisted);
             // If on a dedicated server, send its lamp config to the joining player.
             // In single player, the client's config is trusted as the source of truth.
-            if (server.isDedicated()) {
-                var lampMap = new LinkedHashMap<Identifier, Integer>();
+            if (server.isDedicatedServer()) {
+                var lampMap = new LinkedHashMap<ResourceLocation, Integer>();
                 BLLampConfigAccess.get().extraLampLight.forEach(entry -> {
-                    Identifier id = Identifier.tryParse(entry.id);
+                    ResourceLocation id = ResourceLocation.tryParse(entry.id);
                     if (id != null) lampMap.put(id, entry.luminance);
                 });
                 ServerPlayNetworking.send(joining, new LampConfigSyncPayload(lampMap));
             }
             // Send existing players' states to the joining player
-            for (ServerPlayerEntity other : server.getPlayerManager().getPlayerList()) {
+            for (ServerPlayer other : server.getPlayerList().getPlayers()) {
                 Item lamp = BeltState.getLamp(other);
-                BeltNetworking.sendTo(joining, other.getUuid(), lamp);
+                BeltNetworking.sendTo(joining, other.getUUID(), lamp);
             }
 
         });
 
         // On disconnect, persist the current state for that player
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
-            ServerPlayerEntity leaving = handler.getPlayer();
+            ServerPlayer leaving = handler.getPlayer();
             // Persist full stack with NBT on disconnect
-            BeltLanternSave.get(server).set(leaving.getUuid(), BeltState.getLampStack(leaving));
+            BeltLanternSave.get(server).set(leaving.getUUID(), BeltState.getLampStack(leaving));
         });
 
         // Handle lamp drop/persistence on death and sync after respawn
         ServerPlayerEvents.COPY_FROM.register((oldPlayer, newPlayer, alive) -> {
             if (alive) return;
-            boolean keep = oldPlayer.getWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
-            BeltLanternServer.handleDeath(oldPlayer, keep);
+            boolean keep = oldPlayer.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
+            BeltLanternServer.handleDeath(oldPlayer, newPlayer, keep);
         });
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             if (alive) return;
@@ -118,7 +120,7 @@ public final class BLFabricServerEvents {
             if (dpChanged) {
                 // Attempt a one-time /reload to apply the new datapack
                 try {
-                    server.getCommandManager().executeWithPrefix(server.getCommandSource(), "reload");
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "reload");
                 } catch (Throwable t) {
                     net.oxcodsnet.beltborne_lanterns.BLMod.LOGGER.info("Runtime datapack updated — please run /reload to apply");
                 }
