@@ -1,10 +1,7 @@
 package net.oxcodsnet.beltborne_lanterns.common.client;
 
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.MultiBufferSource;
 
 /**
  * Client-side common debug helpers (platform-agnostic).
@@ -18,7 +15,7 @@ public final class BLDebugRender {
      * To keep builds green without pulling in custom line-rendering code,
      * this method becomes a no-op debug stub.
      */
-    public static void drawAxesAndAnchor(MatrixStack matrices, VertexConsumerProvider vertices, float axisLength) {
+    public static void drawAxesAndAnchor(PoseStack matrices, MultiBufferSource vertices, float axisLength) {
         // Intentionally left blank on 1.21+ to avoid API churn.
     }
 }

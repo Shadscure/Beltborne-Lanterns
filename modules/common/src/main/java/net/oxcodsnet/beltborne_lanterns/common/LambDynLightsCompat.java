@@ -1,14 +1,12 @@
 package net.oxcodsnet.beltborne_lanterns.common;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.function.Function;
-
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.oxcodsnet.beltborne_lanterns.common.client.BLClientAbstractions;
 
@@ -37,11 +35,11 @@ public final class LambDynLightsCompat {
             Class<?> handlerClass = Class.forName("dev.lambdaurora.lambdynlights.api.DynamicLightHandler");
             Class<?> handlersClass = Class.forName("dev.lambdaurora.lambdynlights.api.DynamicLightHandlers");
 
-            Function<PlayerEntity, Integer> luminance = player -> {
+            Function<Player, Integer> luminance = player -> {
                 Item lamp = BLClientAbstractions.clientLamp(player);
                 return lamp != null ? LampRegistry.getLuminance(lamp) : 0;
             };
-            Function<PlayerEntity, Boolean> waterSensitive = player -> false;
+            Function<Player, Boolean> waterSensitive = player -> false;
 
             Method makeHandler = handlerClass.getMethod("makeHandler", Function.class, Function.class);
             Object handler = makeHandler.invoke(null, luminance, waterSensitive);

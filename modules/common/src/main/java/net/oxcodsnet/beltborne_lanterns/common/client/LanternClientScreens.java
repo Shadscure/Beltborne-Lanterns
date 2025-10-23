@@ -1,7 +1,7 @@
 package net.oxcodsnet.beltborne_lanterns.common.client;
 
 import me.shedaniel.autoconfig.AutoConfig;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfig;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfigAccess;
 

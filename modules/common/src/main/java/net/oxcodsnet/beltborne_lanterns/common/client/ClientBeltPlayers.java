@@ -1,11 +1,10 @@
 package net.oxcodsnet.beltborne_lanterns.common.client;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 
 /**
  * Loader-agnostic client-side cache of players who currently have a belt lamp.
@@ -20,12 +19,12 @@ public final class ClientBeltPlayers {
         if (lamp != null) BELT_PLAYERS.put(uuid, lamp); else BELT_PLAYERS.remove(uuid);
     }
 
-    public static boolean hasLantern(PlayerEntity player) {
-        return BELT_PLAYERS.containsKey(player.getUuid());
+    public static boolean hasLantern(Player player) {
+        return BELT_PLAYERS.containsKey(player.getUUID());
     }
 
-    public static Item getLamp(PlayerEntity player) {
-        return BELT_PLAYERS.get(player.getUuid());
+    public static Item getLamp(Player player) {
+        return BELT_PLAYERS.get(player.getUUID());
     }
 
     public static Item getLamp(UUID uuid) {
