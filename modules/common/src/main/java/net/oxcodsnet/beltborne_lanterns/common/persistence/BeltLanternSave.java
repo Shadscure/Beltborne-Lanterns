@@ -4,8 +4,10 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -138,15 +140,17 @@ public final class BeltLanternSave extends SavedData {
     public static BeltLanternSave fromNbt(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         BeltLanternSave save = new BeltLanternSave();
         CompoundTag map = nbt.getCompoundOrEmpty(PLAYERS_KEY);
+        var ops = RegistryOps.create(NbtOps.INSTANCE, registryLookup);
         for (String key : map.keySet()) {
             try {
                 UUID uuid = UUID.fromString(key);
                 Tag el = map.get(key);
                 if (el != null && !(el instanceof StringTag)) { // new format: full encoded stack
-                    ItemStack stack = ItemStack.parse(registryLookup, el).orElse(ItemStack.EMPTY);
-                    if (!stack.isEmpty()) {
-                        save.playersWithLamps.put(uuid, stack);
-                    }
+                    ItemStack.CODEC.parse(ops, el).result().ifPresent(stack -> {
+                        if (!stack.isEmpty()) {
+                            save.playersWithLamps.put(uuid, stack);
+                        }
+                    });
                 } else {
                     map.getString(key).ifPresent(str -> {
                         ResourceLocation id = ResourceLocation.tryParse(str);
@@ -162,9 +166,10 @@ public final class BeltLanternSave extends SavedData {
 
     public CompoundTag writeNbt(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         CompoundTag map = new CompoundTag();
+        var ops = RegistryOps.create(NbtOps.INSTANCE, registryLookup);
         for (Map.Entry<UUID, ItemStack> e : playersWithLamps.entrySet()) {
-            Tag encoded = e.getValue().save(registryLookup);
-            map.put(e.getKey().toString(), encoded);
+            ItemStack stack = e.getValue();
+            ItemStack.CODEC.encodeStart(ops, stack).result().ifPresent(el -> map.put(e.getKey().toString(), el));
         }
         nbt.put(PLAYERS_KEY, map);
         return nbt;

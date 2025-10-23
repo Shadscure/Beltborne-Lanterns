@@ -16,7 +16,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.oxcodsnet.beltborne_lanterns.common.LambDynLightsCompat;
 import net.oxcodsnet.beltborne_lanterns.common.network.BeltSyncPayload;
 import net.oxcodsnet.beltborne_lanterns.common.network.ToggleLanternPayload;
 import net.oxcodsnet.beltborne_lanterns.common.client.BLClientAbstractions;
@@ -24,7 +23,6 @@ import net.oxcodsnet.beltborne_lanterns.common.client.LanternBeltFeatureRenderer
 import net.oxcodsnet.beltborne_lanterns.common.client.ClientBeltPlayers;
 import net.oxcodsnet.beltborne_lanterns.common.client.LanternClientLogic;
 import net.oxcodsnet.beltborne_lanterns.common.client.LanternClientScreens;
-import net.oxcodsnet.beltborne_lanterns.common.config.BLLampConfigAccess;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfigAccess;
 import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
 import net.oxcodsnet.beltborne_lanterns.common.network.LampConfigSyncPayload;
@@ -105,22 +103,6 @@ public final class BLFabricClient implements ClientModInitializer {
 
         // Optionally register dynamic lights for the belt lantern when LambDynamicLights is present
         boolean hasLamb = FabricLoader.getInstance().isModLoaded("lambdynlights");
-        if (hasLamb) {
-            // Prefer typed LDL4 integration when available on classpath (compileOnly).
-            net.oxcodsnet.beltborne_lanterns.fabric.compat.LDL4Fabric.tryInit();
-            // Fallback to LDL3 reflection if not initialized yet.
-            if (!LambDynLightsCompat.isInitialized()) {
-                LambDynLightsCompat.init();
-            }
-            // Retry on ticks until one of the integrations succeeds.
-            ClientTickEvents.END_CLIENT_TICK.register(client -> {
-                if (!LambDynLightsCompat.isInitialized()) {
-                    if (!net.oxcodsnet.beltborne_lanterns.fabric.compat.LDL4Fabric.tryInit()) {
-                        LambDynLightsCompat.init();
-                    }
-                }
-            });
-        }
 
         // Keybind to open config (default: L)
         openConfigKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(

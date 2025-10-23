@@ -13,15 +13,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin {
-    @Inject(method = "updateRenderState(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;F)V",
-            at = @At("TAIL"))
+    @Inject(
+            method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V",
+            at = @At("TAIL")
+    )
     private void bl$captureUUID(LivingEntity entity, LivingEntityRenderState state, float tickDelta, CallbackInfo ci) {
         if (entity instanceof Player && state instanceof PlayerRenderState) {
-            // Store via accessor on the state itself
             if (state instanceof net.oxcodsnet.beltborne_lanterns.common.client.RenderStatePlayerUuidAccess acc) {
                 acc.bl$setPlayerUuid(entity.getUUID());
             }
-            // Keep weak map as a secondary fallback path
             RenderStateUUIDMap.put(state, entity.getUUID());
         }
     }

@@ -13,6 +13,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.oxcodsnet.beltborne_lanterns.common.BeltState;
@@ -52,7 +53,7 @@ public final class BLNeoForgeServerEvents {
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer joining)) return;
-        MinecraftServer server = joining.server;
+        MinecraftServer server = joining.getServer();
         // Restore from persistent save (full stack with NBT) and broadcast
         var persistedStack = BeltLanternSave.get(server).getStack(joining.getUUID());
 
@@ -93,7 +94,7 @@ public final class BLNeoForgeServerEvents {
     public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer leaving)) return;
         // Persist full stack with NBT on disconnect
-        BeltLanternSave.get(leaving.server).set(leaving.getUUID(), BeltState.getLampStack(leaving));
+        BeltLanternSave.get(leaving.getServer()).set(leaving.getUUID(), BeltState.getLampStack(leaving));
         // Clean up dynamic light source when leaving
         DynamicLightsCompat.removeFor(leaving);
     }

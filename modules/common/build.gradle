@@ -22,6 +22,6 @@ dependencies {
 // Ensure a consistent default refmap name for the AP output
 loom {
     mixin {
-        defaultRefmapName = "beltborne_lanterns.refmap.json"
+        defaultRefmapName = "beltborne_lanterns-fabric.refmap.json"
     }
 }

@@ -112,7 +112,7 @@ public final class BLNeoForgeClient {
         for (var skin : event.getSkins()) {
             var renderer = event.getSkin(skin);
             if (renderer instanceof PlayerRenderer per) {
-                per.addLayer(new LanternBeltFeatureRenderer((net.minecraft.client.renderer.entity.RenderLayerParent<?, ?>) per));
+                per.addLayer(new LanternBeltFeatureRenderer(per));
             }
         }
     }
@@ -152,7 +152,12 @@ public final class BLNeoForgeClient {
             }
 
             if (toggleLanternKey != null && toggleLanternKey.consumeClick()) {
-                PacketDistributor.sendToServer(new ToggleLanternPayload());
+                // Send our toggle request to the server using a direct custom payload packet.
+                // PacketDistributor lacks a sendToServer overload in this environment, so use the
+                // vanilla client network handler to transmit the payload.
+                if (mc.getConnection() != null) {
+                    mc.getConnection().send(new net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket(new ToggleLanternPayload()));
+                }
             }
 
             LanternClientLogic.tickLanternPhysics(mc);
