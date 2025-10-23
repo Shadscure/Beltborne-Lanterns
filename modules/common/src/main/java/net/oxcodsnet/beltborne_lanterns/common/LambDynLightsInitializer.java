@@ -5,11 +5,11 @@ import dev.lambdaurora.lambdynlights.api.DynamicLightsInitializer;
 import dev.lambdaurora.lambdynlights.api.entity.EntityLightSourceManager;
 import dev.lambdaurora.lambdynlights.api.entity.luminance.EntityLuminance;
 import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.oxcodsnet.beltborne_lanterns.common.client.BLClientAbstractions;
 
@@ -22,7 +22,7 @@ import net.oxcodsnet.beltborne_lanterns.common.client.BLClientAbstractions;
  */
 public final class LambDynLightsInitializer implements DynamicLightsInitializer {
     static final EntityLuminance.Type PLAYER_LANTERN = EntityLuminance.Type.registerSimple(
-            Identifier.of(BLMod.MOD_ID, "player_lantern"),
+            ResourceLocation.fromNamespaceAndPath(BLMod.MOD_ID, "player_lantern"),
             PlayerLanternLuminance.INSTANCE
     );
 
@@ -44,7 +44,7 @@ public final class LambDynLightsInitializer implements DynamicLightsInitializer 
 
         @Override
         public int getLuminance(ItemLightSourceManager itemLightSourceManager, Entity entity) {
-            if (entity instanceof PlayerEntity player) {
+            if (entity instanceof Player player) {
                 Item lamp = BLClientAbstractions.clientLamp(player);
                 return lamp != null ? LampRegistry.getLuminance(lamp) : 0;
             }
