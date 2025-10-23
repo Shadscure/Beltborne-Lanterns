@@ -1,31 +1,31 @@
 package net.oxcodsnet.beltborne_lanterns.common.network;
 
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Uuids;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 
 import java.util.UUID;
 
-public record BeltSyncPayload(UUID playerUuid, Identifier lampId) implements CustomPayload {
-    public static final Id<BeltSyncPayload> ID = new Id<>(Identifier.of(BLMod.MOD_ID, "belt_sync"));
-    public static final PacketCodec<RegistryByteBuf, BeltSyncPayload> CODEC = new PacketCodec<>() {
+public record BeltSyncPayload(UUID playerUuid, ResourceLocation lampId) implements CustomPacketPayload {
+    public static final Type<BeltSyncPayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(BLMod.MOD_ID, "belt_sync"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, BeltSyncPayload> CODEC = new StreamCodec<>() {
         @Override
-        public BeltSyncPayload decode(RegistryByteBuf buf) {
-            UUID uuid = Uuids.PACKET_CODEC.decode(buf);
+        public BeltSyncPayload decode(RegistryFriendlyByteBuf buf) {
+            UUID uuid = UUIDUtil.STREAM_CODEC.decode(buf);
             boolean has = buf.readBoolean();
-            Identifier id = has ? buf.readIdentifier() : null;
+            ResourceLocation id = has ? buf.readResourceLocation() : null;
             return new BeltSyncPayload(uuid, id);
         }
 
         @Override
-        public void encode(RegistryByteBuf buf, BeltSyncPayload value) {
-            Uuids.PACKET_CODEC.encode(buf, value.playerUuid());
+        public void encode(RegistryFriendlyByteBuf buf, BeltSyncPayload value) {
+            UUIDUtil.STREAM_CODEC.encode(buf, value.playerUuid());
             if (value.lampId() != null) {
                 buf.writeBoolean(true);
-                buf.writeIdentifier(value.lampId());
+                buf.writeResourceLocation(value.lampId());
             } else {
                 buf.writeBoolean(false);
             }
@@ -33,7 +33,7 @@ public record BeltSyncPayload(UUID playerUuid, Identifier lampId) implements Cus
     };
 
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public Type<? extends CustomPacketPayload> type() {
         return ID;
     }
 }

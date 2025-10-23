@@ -1,11 +1,10 @@
 package net.oxcodsnet.beltborne_lanterns.common.physics;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 
 /**
  * Registry + updater for per-player lantern sway physics (platform-agnostic).
@@ -52,20 +51,20 @@ public final class LanternSwingManager {
     }
 
     /** Call once per client tick (20Hz). dtSec should be 1/20. */
-    public static void tickPlayer(PlayerEntity p, float dtSec, float baseRotXDeg) {
-        final UUID id = p.getUuid();
+    public static void tickPlayer(Player p, float dtSec, float baseRotXDeg) {
+        final UUID id = p.getUUID();
         final LanternSwingState state = getOrCreate(id);
         final Kinematics kin = KIN.computeIfAbsent(id, u -> new Kinematics());
 
         // Measure
-        float yaw = wrapDegrees(p.getYaw());
+        float yaw = wrapDegrees(p.getYRot());
         float yawRateDegPerSec = wrapDegrees(yaw - kin.prevYaw) / Math.max(dtSec, 1e-4f);
         float yawRateRadPerSec = (float) Math.toRadians(yawRateDegPerSec);
 
         // Velocity components
-        double vx = p.getVelocity().x; // blocks/tick
-        double vz = p.getVelocity().z;
-        double vy = p.getVelocity().y;
+        double vx = p.getDeltaMovement().x; // blocks/tick
+        double vz = p.getDeltaMovement().z;
+        double vy = p.getDeltaMovement().y;
 
         // Convert to per-second scales where needed
         double hSpeedPerSec = Math.hypot(vx, vz) * 20.0;
@@ -94,9 +93,9 @@ public final class LanternSwingManager {
         float uX = (float) (K_HSPEED * vFwdPerSec + K_HACCEL * aFwd + K_YACCEL * yAcc);
 
         // Impulses: jump/land/crouch transitions
-        boolean onGround = p.isOnGround();
+        boolean onGround = p.onGround();
         boolean wasOnGround = kin.prevOnGround;
-        boolean sneaking = p.isSneaking();
+        boolean sneaking = p.isShiftKeyDown();
         boolean wasSneaking = kin.prevSneaking;
         boolean moving = hSpeedPerSec > MOVE_THRESHOLD_BPS;
         boolean wasMoving = kin.prevMoving;
@@ -170,7 +169,7 @@ public final class LanternSwingManager {
     }
 
     private static float wrapDegrees(float deg) {
-        return MathHelper.wrapDegrees(deg);
+        return Mth.wrapDegrees(deg);
     }
 
     private static float approachExp(float current, float target, float dtSec, float tauSec) {
