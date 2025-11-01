@@ -16,7 +16,7 @@ logoFile = "assets/beltborne_lanterns/icon.png"
 [[dependencies.beltborne_lanterns]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.1,)"
+versionRange = "[21.0,)"
 ordering = "NONE"
 side = "BOTH"
 
