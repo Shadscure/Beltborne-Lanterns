@@ -2,6 +2,21 @@
   <img src="https://cdn.modrinth.com/data/NUFDZAKS/4c2ae7ef695e568902814ab197689b922e530236_96.webp" width="128" height="128" alt="Beltborne Lanterns icon">
 </p>
 
+<p align="center" style="display:flex;justify-content:center;gap:8px;margin:6px 0;">
+  <a href="https://modrinth.com/project/beltborne-lanterns">
+    <img alt="Modrinth" height="48" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy-minimal/available/modrinth_vector.svg">
+  </a>&nbsp;
+  <a href="https://www.curseforge.com/minecraft/mc-mods/beltborne-lanterns">
+    <img alt="CurseForge" height="48" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy-minimal/available/curseforge_vector.svg">
+  </a>&nbsp;
+  <a href="https://discord.gg/9JRb3JMAD3">
+    <img alt="Discord" height="48" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy-minimal/social/discord-plural_vector.svg">
+  </a>&nbsp;
+  <a href="https://github.com/Shadscure/Beltborne-Lanterns">
+    <img alt="GitHub" height="48" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy-minimal/available/github_vector.svg">
+  </a>
+</p>
+
 <p align="center">
   <a href="https://modrinth.com/project/beltborne-lanterns">
     <img alt="Modrinth Downloads" src="https://img.shields.io/modrinth/dt/NUFDZAKS?style=flat&logo=modrinth">
@@ -11,27 +26,8 @@
   </a>
 </p>
 
-<p align="center" style="display: flex; justify-content: center; gap: 6px;">
-    <a href="https://modrinth.com/project/beltborne-lanterns/versions?l=fabric">
-        <img src="https://cdn.modrinth.com/data/cached_images/d8a8d9852fb6e55292d6f5ecc1842fd7bc8c3c9e.webp" alt="Available on Fabric">
-    </a>
-    <a href="https://modrinth.com/project/beltborne-lanterns/versions?l=quilt">
-        <img src="https://cdn.modrinth.com/data/cached_images/77e67c2eae40b638430d5959e9a0d0ef60f76f41.webp" alt="Available on Quilt">
-    </a>
-   <a href="https://modrinth.com/project/beltborne-lanterns/versions?l=neoforge">
-    <img src="https://cdn.modrinth.com/data/cached_images/ecbd0303728027761730760800f9354e14f38d31.webp" alt="Available on NeoForge">
-  </a>
-</p>
-<p align="center" style="display:flex;justify-content:center;gap:8px;margin:6px 0;">
-  <a href="https://boosty.to/0xcodsnet" target="_blank" rel="noopener">
-    <img alt="Boosty — Support" src="https://cdn.modrinth.com/data/cached_images/e5ac57a392801dee070cc961eb901e1379c945b6.webp">
-  </a>
-</p>
-
-<p align="center" style="display:flex;justify-content:center;gap:8px;margin:6px 0;">
-  <a href="https://discord.gg/9JRb3JMAD3" target="_blank" rel="noopener">
-    <img alt="discord-plural" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy-minimal/social/discord-plural_vector.svg">
-  </a>
+<p align="center">
+ <img alt="Latest release" src="https://img.shields.io/github/v/release/Shadscure/Beltborne-Lanterns?display_name=release&sort=semver&style=flat">
 </p>
 
 
@@ -55,22 +51,24 @@ Need it back in your hands? Press **B** again. 💡
 
 > *Dynamic lighting note:* the in‑world light effect requires a dynamic lighting mod — see FAQ.
 
+## ⧉ Add-ons
+ - **Beltborne Lanterns - Accessories Layer**:  [Modrinth](https://modrinth.com/mod/beltborne-lanterns-accessories-layer) / [Curseforge](https://www.curseforge.com/minecraft/mc-mods/beltborne-lanterns-accessories-layer) / [Github](https://github.com/Shadscure/Beltborne-Lanterns-Accessories-Layer)
 
 ## 📷 Showcase
 
 <table>
   <tr>
-    <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo1.gif" alt="demo 1" width="380"></td>
-    <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo2.gif" alt="demo 2" width="380"></td>
+    <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo1.webp" alt="demo 1" width="380"></td>
+    <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo2.webp" alt="demo 2" width="380"></td>
   
   </tr>
   <tr>
-     <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo3.gif" alt="demo 3" width="380"></td>
-     <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo4.gif" alt="demo 4" width="380"></td>
+     <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo3.webp" alt="demo 3" width="380"></td>
+     <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo4.webp" alt="demo 4" width="380"></td>
   </tr>
   <tr>
-    <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo5.gif" alt="demo 5" width="380"></td>
-    <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo6.gif" alt="demo 6" width="380"></td>
+    <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo5.webp" alt="demo 5" width="380"></td>
+    <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo6.webp" alt="demo 6" width="380"></td>
   </tr>
 </table>
 
@@ -78,9 +76,8 @@ Need it back in your hands? Press **B** again. 💡
 
 * **Does it work in multiplayer?** — **YES!** *(Requires both client and server)*
 * **Does it emit light in vanilla Minecraft?** — **No.** Install a dynamic lighting mod to get light from the belt lantern:
-    * **Fabric:** [LambDynamicLights](https://modrinth.com/mod/lambdynamiclights)
-    * **NeoForge:** [LambDynamicLights Unofficial](https://modrinth.com/mod/lambdynamiclights-unofficial-neoforge)
-    * **NeoForge (with interop):** [LambDynamicLights](https://modrinth.com/mod/lambdynamiclights) + [Connector](https://modrinth.com/mod/connector)
+  * **Fabric / Quilt / NeoForge:** [LambDynamicLights](https://modrinth.com/mod/lambdynamiclights)
+  * **Alternative (NeoForge):** [Dynamic Lights (AtomicStryker)](https://www.curseforge.com/minecraft/mc-mods/dynamic-lights)
 * **Will this work with the Soul Lantern?** — **YES!**
 * **Will this work with a lantern from another mod?** — **YES!** Add its **item tag** to the compatible list in the config.
 * **Does this work with the [Accessories](https://modrinth.com/mod/accessories)?** — **YES**, Install the **[Beltborne Lanterns: Accessories Layer](https://modrinth.com/mod/beltborne-lanterns-accessories-layer)** add-on.
