@@ -180,10 +180,7 @@ subprojects {
         maven { url = uri('https://maven.wispforest.io') }
         maven { url = uri('https://maven.terraformersmc.com/') }
         maven { url = uri('https://maven.shedaniel.me/') }
-        maven {
-            name = "Gegy"
-            url = uri("https://maven.gegy.dev")
-        }
+        maven { url = uri("https://maven.gegy.dev") }
     }
 
     dependencies {
@@ -248,7 +245,6 @@ subprojects {
                         }
                     }
                 }
-                // dev/fat добавим ниже, когда Shadow будет применён
             }
         }
 
@@ -271,22 +267,6 @@ subprojects {
                             } else {
                                 username = user ?: 'token'; password = token
                             }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // ---- добавляем dev (shadowJar) как доп. артефакт к mavenJava
-    plugins.withId('com.gradleup.shadow') {
-        publishing {
-            publications {
-                named('mavenJava', MavenPublication) {
-                    if (tasks.findByName('shadowJar')) {
-                        artifact(tasks.named('shadowJar')) {
-                            classifier = "dev"        // без MC (он уже в artifactId)
-                            builtBy(tasks.named('shadowJar'))
                         }
                     }
                 }
