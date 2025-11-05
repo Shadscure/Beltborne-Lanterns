@@ -3,11 +3,10 @@ package net.oxcodsnet.beltborne_lanterns.common.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.state.BlockState;
@@ -21,7 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
-public class LanternBeltFeatureRenderer extends RenderLayer<PlayerRenderState, PlayerModel> {
+public class LanternBeltFeatureRenderer extends RenderLayer<AvatarRenderState, PlayerModel> {
 
     // The lantern model might need a rotation adjustment to face forward.
     private static final float MODEL_Y_ROTATION_DEGREES = 180f;
@@ -30,26 +29,25 @@ public class LanternBeltFeatureRenderer extends RenderLayer<PlayerRenderState, P
     @SuppressWarnings("unchecked")
     public LanternBeltFeatureRenderer(RenderLayerParent<?, ?> context) {
         // Cast to the exact generic pair expected by the superclass.
-        super((RenderLayerParent<PlayerRenderState, PlayerModel>) context);
+        super((RenderLayerParent<AvatarRenderState, PlayerModel>) context);
     }
 
     @Override
-    public void render(PoseStack matrices,
-                       MultiBufferSource vertexConsumers,
+    public void submit(PoseStack matrices,
+                       SubmitNodeCollector collector,
                        int light,
-                       PlayerRenderState state,
+                       AvatarRenderState state,
                        float limbAngle,
                        float limbDistance) {
+        Minecraft mc = Minecraft.getInstance();
         // MC 1.21+ feature renderers receive a render-state, not the entity.
         // Determine the rendered player's UUID from the state when possible.
         UUID subject = null;
-        // First, try accessor injected into render state
-        if (state instanceof RenderStatePlayerUuidAccess acc) {
-            subject = acc.bl$getPlayerUuid();
-        }
-        // Next, try the mixin-provided map that binds states to entities at updateRenderState time
-        if (subject == null) {
-            subject = RenderStateUUIDMap.get(state);
+        if (mc.level != null) {
+            var entity = mc.level.getEntity(state.id);
+            if (entity instanceof net.minecraft.world.entity.player.Player player) {
+                subject = player.getUUID();
+            }
         }
         // If unavailable, try to obtain UUID from the render state via reflection to be resilient to mapping changes
         try {
@@ -92,9 +90,9 @@ public class LanternBeltFeatureRenderer extends RenderLayer<PlayerRenderState, P
         } catch (Throwable ignored) {
         }
 
-        if (subject == null && Minecraft.getInstance().player != null) {
+        if (subject == null && mc.player != null) {
             // Fallback: use local player if state field mapping changes
-            subject = Minecraft.getInstance().player.getUUID();
+            subject = mc.player.getUUID();
             if (!UUID_LOOKUP_WARNED) {
                 net.oxcodsnet.beltborne_lanterns.BLMod.LOGGER.warn("Beltborne Lanterns: falling back to local player UUID in feature renderer; mixin may be needed for this mapping.");
                 UUID_LOOKUP_WARNED = true;
@@ -127,7 +125,7 @@ public class LanternBeltFeatureRenderer extends RenderLayer<PlayerRenderState, P
         if (BLClientAbstractions.isDebugDrawEnabled()) {
             matrices.pushPose();
             matrices.translate(pivX, pivY, pivZ);
-            BLDebugRender.drawAxesAndAnchor(matrices, vertexConsumers, 0.25f);
+            BLDebugRender.drawAxesAndAnchor(matrices, null, 0.25f);
             matrices.popPose();
         }
 
@@ -144,9 +142,8 @@ public class LanternBeltFeatureRenderer extends RenderLayer<PlayerRenderState, P
 
         matrices.translate(-pivX, -pivY, -pivZ);
 
-        BlockRenderDispatcher brm = Minecraft.getInstance().getBlockRenderer();
         BlockState blockState = LampRegistry.getState(lampItem);
-        brm.renderSingleBlock(blockState, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
+        collector.submitBlock(matrices, blockState, light, OverlayTexture.NO_OVERLAY, state.outlineColor);
 
         matrices.popPose();
     }

@@ -7,8 +7,7 @@
   "mixins": [
   ],
   "client": [
-    "LivingEntityRendererMixin",
-    "PlayerEntityRenderStateAccessorMixin"
+    "AvatarRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

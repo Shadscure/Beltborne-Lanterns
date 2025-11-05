@@ -1,5 +1,6 @@
 package net.oxcodsnet.beltborne_lanterns.common.client.ui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -7,6 +8,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.InputQuirks;
 import net.minecraft.network.chat.Component;
 import net.oxcodsnet.beltborne_lanterns.common.client.BLClientAbstractions;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfig;
@@ -112,16 +115,16 @@ public class LanternDebugScreen extends Screen {
         // Use 1/1000 precision so 0.005/0.025 steps are exact
         float base = STEP_PRESETS[stepIndex] * 1000f;
         float mul = 1.0f;
-        if (hasShiftDown()) mul *= 10f;
-        if (hasControlDown()) mul *= 0.1f;
+        if (isShiftDown()) mul *= 10f;
+        if (isControlDown()) mul *= 0.1f;
         return Math.max(1, Math.round(base * mul));
     }
 
     private int scaledRotStepDeg() {
         float base = 5f;
         float mul = 1.0f;
-        if (hasShiftDown()) mul *= 3.0f;
-        if (hasControlDown()) mul *= 0.2f;
+        if (isShiftDown()) mul *= 3.0f;
+        if (isControlDown()) mul *= 0.2f;
         return Math.max(1, Math.round(base * mul));
     }
 
@@ -147,6 +150,22 @@ public class LanternDebugScreen extends Screen {
         Minecraft.getInstance().keyboardHandler.setClipboard(jsonish);
     }
 
+    private static boolean isShiftDown() {
+        var window = Minecraft.getInstance().getWindow();
+        return InputConstants.isKeyDown(window, InputConstants.KEY_LSHIFT)
+                || InputConstants.isKeyDown(window, InputConstants.KEY_RSHIFT);
+    }
+
+    private static boolean isControlDown() {
+        var window = Minecraft.getInstance().getWindow();
+        if (InputQuirks.REPLACE_CTRL_KEY_WITH_CMD_KEY) {
+            return InputConstants.isKeyDown(window, InputQuirks.EDIT_SHORTCUT_KEY_LEFT)
+                    || InputConstants.isKeyDown(window, InputQuirks.EDIT_SHORTCUT_KEY_RIGHT);
+        }
+        return InputConstants.isKeyDown(window, InputConstants.KEY_LCONTROL)
+                || InputConstants.isKeyDown(window, InputConstants.KEY_RCONTROL);
+    }
+
     @Override
     public void onClose() {
         BLClientAbstractions.setDebugDrawEnabled(prevDebugEnabled);
@@ -154,9 +173,10 @@ public class LanternDebugScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyEvent event) {
         BLClientConfig cfg = BLClientConfigAccess.get();
         boolean used = false;
+        int keyCode = event.key();
         switch (keyCode) {
             case 262: cfg.offsetX100 += scaledStep100(); used = true; break;
             case 263: cfg.offsetX100 -= scaledStep100(); used = true; break;
@@ -185,7 +205,7 @@ public class LanternDebugScreen extends Screen {
             refreshCopyPreview();
             return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override

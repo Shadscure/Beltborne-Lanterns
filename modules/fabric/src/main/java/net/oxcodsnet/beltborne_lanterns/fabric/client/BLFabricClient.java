@@ -8,18 +8,16 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.oxcodsnet.beltborne_lanterns.common.network.BeltSyncPayload;
 import net.oxcodsnet.beltborne_lanterns.common.network.ToggleLanternPayload;
 import net.oxcodsnet.beltborne_lanterns.common.client.BLClientAbstractions;
-import net.oxcodsnet.beltborne_lanterns.common.client.LanternBeltFeatureRenderer;
 import net.oxcodsnet.beltborne_lanterns.common.client.ClientBeltPlayers;
 import net.oxcodsnet.beltborne_lanterns.common.client.LanternClientLogic;
 import net.oxcodsnet.beltborne_lanterns.common.client.LanternClientScreens;
@@ -33,6 +31,8 @@ import java.util.UUID;
 
 public final class BLFabricClient implements ClientModInitializer {
     // Keybindings
+    private static final KeyMapping.Category BELTBORNE_CATEGORY =
+            KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(BLMod.MOD_ID, "beltborne_lanterns"));
     private static KeyMapping openConfigKey;
     private static KeyMapping toggleDebugKey;
     private static KeyMapping openDebugEditorKey;
@@ -85,15 +85,6 @@ public final class BLFabricClient implements ClientModInitializer {
             });
         });
 
-        // Register a feature renderer for players to draw the lantern on the belt
-        @SuppressWarnings("unchecked")
-        LivingEntityFeatureRendererRegistrationCallback playerFeatureRendererCallback = (entityType, renderer, helper, context) -> {
-            if (entityType == EntityType.PLAYER) {
-                helper.register(new LanternBeltFeatureRenderer(renderer));
-            }
-        };
-        LivingEntityFeatureRendererRegistrationCallback.EVENT.register(playerFeatureRendererCallback);
-
         // Clean up swing manager state when a player entity is unloaded
         ClientEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
             if (entity instanceof Player) {
@@ -108,28 +99,28 @@ public final class BLFabricClient implements ClientModInitializer {
         openConfigKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.beltborne_lanterns.open_config",
                 InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_L,
-                "category.beltborne_lanterns"
+                BELTBORNE_CATEGORY
         ));
 
         // Keybind to toggle debug gizmos (default: K)
         toggleDebugKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.beltborne_lanterns.toggle_debug",
                 InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K,
-                "category.beltborne_lanterns"
+                BELTBORNE_CATEGORY
         ));
 
         // Keybind to open lantern debug editor (default: P)
         openDebugEditorKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.beltborne_lanterns.open_debug",
                 InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_P,
-                "category.beltborne_lanterns"
+                BELTBORNE_CATEGORY
         ));
 
         // Keybind to toggle belt lantern (default: B)
         toggleLanternKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.beltborne_lanterns.toggle_lantern",
                 InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B,
-                "category.beltborne_lanterns"
+                BELTBORNE_CATEGORY
         ));
 
         // Wire platform abstractions so common renderer can query state/debug
