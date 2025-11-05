@@ -61,10 +61,22 @@ public final class LanternSwingManager {
         float yawRateDegPerSec = wrapDegrees(yaw - kin.prevYaw) / Math.max(dtSec, 1e-4f);
         float yawRateRadPerSec = (float) Math.toRadians(yawRateDegPerSec);
 
-        // Velocity components
-        double vx = p.getDeltaMovement().x; // blocks/tick
-        double vz = p.getDeltaMovement().z;
-        double vy = p.getDeltaMovement().y;
+        double px = p.getX();
+        double py = p.getY();
+        double pz = p.getZ();
+
+        double vxTick = px - kin.prevX;
+        double vyTick = py - kin.prevY;
+        double vzTick = pz - kin.prevZ;
+        if (!kin.posInit) {
+            vxTick = vyTick = vzTick = 0.0;
+            kin.posInit = true;
+        }
+
+        // Velocity components (per tick)
+        double vx = vxTick;
+        double vz = vzTick;
+        double vy = vyTick;
 
         // Convert to per-second scales where needed
         double hSpeedPerSec = Math.hypot(vx, vz) * 20.0;
@@ -139,6 +151,9 @@ public final class LanternSwingManager {
         kin.prevVFwdPerSec = vFwdPerSec;
         kin.prevVRightPerSec = vRightPerSec;
         kin.prevMoving = moving;
+        kin.prevX = px;
+        kin.prevY = py;
+        kin.prevZ = pz;
 
         KIN.put(id, kin);
         STATES.put(id, state);
@@ -190,5 +205,9 @@ public final class LanternSwingManager {
         boolean prevMoving = false;
         float baseXDegSmoothed = 0f;     // smoothed base X for crouch blending
         boolean baseInit = false;
+        double prevX;
+        double prevY;
+        double prevZ;
+        boolean posInit = false;
     }
 }
