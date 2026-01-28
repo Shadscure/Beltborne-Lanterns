@@ -95,7 +95,10 @@ remapJar {
 // =========== Modrith =========
 apply plugin: "com.modrinth.minotaur"
 def modrinth_token = rootProject.ext.resolveModrinthToken()
-if (!modrinth_token) throw new GradleException("Set MODRINTH_TOKEN env or in .env")
+if (!modrinth_token) {
+    logger.warn("WARNING: MODRINTH_TOKEN not found in .env or environment. Publishing to Modrinth will be skipped.")
+    modrinth_token = "dummy_token_publishing_disabled"
+}
 
 modrinth {
     token = modrinth_token
@@ -114,7 +117,10 @@ modrinth {
 apply plugin: "net.darkhax.curseforgegradle"
 
 def curse_token = rootProject.ext.resolveCurseforgeToken()
-if (!curse_token) throw new GradleException("Set CURSEFORGE_TOKEN env or in .env/gradle.properties")
+if (!curse_token) {
+    logger.warn("WARNING: CURSEFORGE_TOKEN not found in .env or environment. Publishing to CurseForge will be skipped.")
+    curse_token = "dummy_token_publishing_disabled"
+}
 
 
 def curse_project_id =

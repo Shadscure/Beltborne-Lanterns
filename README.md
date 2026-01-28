@@ -89,31 +89,25 @@ Need it back in your hands? Press **B** again. 💡
     <img width="854" height="480" alt="2025-09-02_22 58 42" src="https://github.com/user-attachments/assets/cdcde99f-b18e-4d9c-946e-888637c1ad8e" />
   </details>
 
-## 📥 Installation (Minecraft 1.21.x)
+## Dynamic Lights Compatibility
 
-**Loaders:** Fabric / Quilt / NeoForge
+Beltborne Lanterns supports dynamic lighting through **LambDynamicLights** (recommended).
 
-1. Install a **loader** compatible with your game:
-   - **Fabric**
-   - **Quilt**
-   - **NeoForge**
-2. **Required dependency (all loaders):**  
-   - **Cloth Config** *(mandatory on Fabric / Quilt / NeoForge)*
-3. Download the mod:
-   <p align="center" style="display:flex;justify-content:center;gap:8px;margin:6px 0;">
-     <a href="https://modrinth.com/project/beltborne-lanterns">
-       <img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/available/modrinth_vector.svg" alt="Available on Modrinth">
-     </a>
-     <a href="https://www.curseforge.com/minecraft/mc-mods/beltborne-lanterns">
-       <img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/available/curseforge_vector.svg" alt="Available on CurseForge">
-     </a>
-   </p>
-4. Place the `.jar` file in your `mods` folder.
-5. *(Optional)*
-   - **Mod Menu** (Fabric/Quilt) for quick access to settings.
-   - **Catalogue** by MrCrayfish (NeoForge)
-     > Settings are also available from the mods list
+**Sodium Dynamic Lights** (fork of LambDynamicLights) is also technically supported, but:
+- Issues related to Sodium Dynamic Lights will be closed
+- Please use [LambDynamicLights](https://modrinth.com/mod/lambdynamiclights) for full support
+- I cannot maintain compatibility with forks that may diverge from the original API
 
+## Known Limitations
+
+### Bliss Shaders Floodfill
+Belt lanterns are **incompatible** with Bliss Shaders' Floodfill colored lighting option.
+
+**Why:** Floodfill voxelizes world blocks to compute lighting. Entity-attached items (like belt lanterns) exist outside this voxel space and cannot be detected.
+
+**Workarounds:**
+- Disable Floodfill in Bliss Shaders settings
+- Use [LambDynamicLights](https://modrinth.com/mod/lambdynamiclights) for dynamic lighting (fully supported)
 
 ## 📜 License
 

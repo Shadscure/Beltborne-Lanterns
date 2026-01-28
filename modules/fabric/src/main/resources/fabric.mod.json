@@ -29,6 +29,9 @@
     ],
     "lambdynlights:initializer": [
       "net.oxcodsnet.beltborne_lanterns.fabric.compat.LambDynLightsInitializer"
+    ],
+    "dynamiclights": [
+      "net.oxcodsnet.beltborne_lanterns.fabric.compat.LambDynLightsInitializer"
     ]
   },
   "mixins": [
