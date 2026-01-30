@@ -50,6 +50,10 @@ sourceSets {
     }
 }
 
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
     minecraft "net.minecraft:minecraft:${rootProject.minecraft_version}"
     mappings loom.officialMojangMappings()

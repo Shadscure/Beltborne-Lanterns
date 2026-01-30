@@ -53,6 +53,10 @@ sourceSets {
     }
 }
 
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
     // Cloth Config
     implementation "me.shedaniel.cloth:cloth-config-neoforge:${rootProject.cloth_config_version}"
