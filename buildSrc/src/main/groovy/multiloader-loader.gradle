@@ -3,7 +3,11 @@
 
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
+
+// groupId: add platform suffix (e.g. net.oxcodsnet.beltborne_lanterns.fabric)
+group = "${rootProject.maven_group}.${project.name}"
 
 java {
     toolchain {
@@ -65,4 +69,73 @@ tasks.named('sourcesJar') {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.release = 21
+}
+
+// Maven publishing configuration (identical to architectury-loom)
+publishing {
+    def mcTag = "mc" + rootProject.minecraft_version
+
+    publications {
+        mavenJava(MavenPublication) {
+            def baseId = base.archivesName.get()                 // e.g. beltborne_lanterns-fabric
+            artifactId = "${baseId}-${mcTag}"                    // -> beltborne_lanterns-fabric-mc1.21
+
+            if (tasks.findByName('remapJar')) {
+                artifact(tasks.named('remapJar')) {               // runtime jar
+                    builtBy(tasks.named('remapJar'))
+                }
+
+                if (tasks.findByName('remapSourcesJar')) {
+                    artifact(tasks.named('remapSourcesJar')) {     // sources
+                        classifier = "sources"
+                        builtBy(tasks.named('remapSourcesJar'))
+                    }
+                } else if (tasks.findByName('sourcesJar')) {
+                    artifact(tasks.named('sourcesJar')) {
+                        classifier = "sources"
+                        builtBy(tasks.named('sourcesJar'))
+                    }
+                }
+            } else {
+                if (tasks.findByName('jar')) {
+                    artifact(tasks.named('jar')) {                 // runtime jar
+                        builtBy(tasks.named('jar'))
+                    }
+                }
+                if (tasks.findByName('sourcesJar')) {
+                    artifact(tasks.named('sourcesJar')) {          // sources
+                        classifier = "sources"
+                        builtBy(tasks.named('sourcesJar'))
+                    }
+                }
+            }
+        }
+    }
+
+    // Repository from .env / gradle.properties
+    repositories {
+        def repoUrl = rootProject.ext.resolveMavenRepoUrl()
+        if (repoUrl) {
+            maven {
+                name = rootProject.ext.resolveMavenRepoName()
+                url = uri(repoUrl)
+
+                def user  = rootProject.ext.resolveMavenRepoUsername()
+                def pass  = rootProject.ext.resolveMavenRepoPassword()
+                def token = rootProject.ext.resolveMavenRepoToken()
+
+                if ((user && pass) || token) {
+                    credentials {
+                        if (user && pass) {
+                            username = user
+                            password = pass
+                        } else {
+                            username = user ?: 'token'
+                            password = token
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
