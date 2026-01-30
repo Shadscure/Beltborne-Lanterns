@@ -68,3 +68,8 @@ modules/fabric/src/main/generated/.cache
 modules/quilt/src/main/generated/.cache
 modules/neoforge/src/main/generated/.cache
 /modules/fabric/bin/
+/modules/neoforge/bin/
+/modules/neoforge/.eclipse/
+/modules/fabric/.eclipse/
+/modules/common/bin/
+/.serena/
