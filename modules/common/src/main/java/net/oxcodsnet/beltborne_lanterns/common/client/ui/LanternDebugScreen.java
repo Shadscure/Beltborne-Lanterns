@@ -189,7 +189,7 @@ public class LanternDebugScreen extends Screen {
     }
 
     @Override
-    protected void renderBlurredBackground(float delta) {
+    protected void renderBlurredBackground() {
         // keep world visible
     }
 

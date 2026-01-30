@@ -28,14 +28,14 @@
       "net.oxcodsnet.beltborne_lanterns.fabric.client.BLFabricModMenu"
     ],
     "lambdynlights:initializer": [
-      "net.oxcodsnet.beltborne_lanterns.fabric.compat.LambDynLightsInitializer"
+      "net.oxcodsnet.beltborne_lanterns.common.LambDynLightsInitializer"
     ],
     "dynamiclights": [
-      "net.oxcodsnet.beltborne_lanterns.fabric.compat.LambDynLightsInitializer"
+      "net.oxcodsnet.beltborne_lanterns.common.LambDynLightsInitializer"
     ]
   },
   "mixins": [
-    "beltborne_lanterns.mixins.json"
+    "beltborne_lanterns.fabric.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",

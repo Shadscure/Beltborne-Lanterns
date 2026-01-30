@@ -78,7 +78,7 @@ public final class BLNeoForgeNetwork {
                 BeltSyncPayload.CODEC,
                 (payload, ctx) -> {
                     UUID uuid = payload.playerUuid();
-                    Item lamp = payload.lampId() != null ? BuiltInRegistries.ITEM.get(payload.lampId()) : null;
+                    Item lamp = payload.lampId() != null ? BuiltInRegistries.ITEM.getValue(payload.lampId()) : null;
                     ClientBeltPlayers.setLamp(uuid, lamp);
                 }
         );

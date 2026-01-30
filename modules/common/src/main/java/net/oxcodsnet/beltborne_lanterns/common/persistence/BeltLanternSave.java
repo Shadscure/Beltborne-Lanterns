@@ -89,7 +89,7 @@ public final class BeltLanternSave extends SavedData {
                 if (map.contains(key, Tag.TAG_STRING)) {
                     ResourceLocation id = ResourceLocation.tryParse(map.getString(key));
                     if (id != null) {
-                        save.playersWithLamps.put(uuid, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(id)));
+                        save.playersWithLamps.put(uuid, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(id)));
                     }
                 }
             } catch (IllegalArgumentException ignored) {}
@@ -112,7 +112,7 @@ public final class BeltLanternSave extends SavedData {
                 } else if (el instanceof StringTag) {
                     ResourceLocation id = ResourceLocation.tryParse(map.getString(key));
                     if (id != null) {
-                        save.playersWithLamps.put(uuid, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(id)));
+                        save.playersWithLamps.put(uuid, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(id)));
                     }
                 }
             } catch (IllegalArgumentException ignored) {}
