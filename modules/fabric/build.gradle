@@ -38,6 +38,22 @@ loom {
     }
 }
 
+fabricApi {
+    configureDataGeneration()
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += file("src/main/generated")
+        }
+    }
+}
+
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
     minecraft "net.minecraft:minecraft:${rootProject.minecraft_version}"
     mappings loom.officialMojangMappings()
@@ -56,10 +72,12 @@ dependencies {
     modCompileOnly "dev.lambdaurora.lambdynamiclights:lambdynamiclights-api:${rootProject.lambdynamiclights_version}"
 
     // LambDynamicLights (runtime only for testing)
-    modLocalRuntime "dev.lambdaurora.lambdynamiclights:lambdynamiclights-runtime:${rootProject.lambdynamiclights_version}"
+    // Disabled: no LDL version available for MC 1.21.2
+    // modLocalRuntime "dev.lambdaurora.lambdynamiclights:lambdynamiclights-runtime:${rootProject.lambdynamiclights_version}"
 }
 
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     def props = [
         version: project.version,
         mod_id: rootProject.findProperty('mod_id'),

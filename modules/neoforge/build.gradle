@@ -27,6 +27,15 @@ neoForge {
         server {
             server()
         }
+        data {
+            data()
+            programArguments.addAll(
+                '--mod', modId,
+                '--all',
+                '--output', file('src/main/generated').absolutePath,
+                '--existing', file('src/main/resources').absolutePath
+            )
+        }
     }
 
     mods {
@@ -34,6 +43,18 @@ neoForge {
             sourceSet(sourceSets.main)
         }
     }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += file("src/main/generated")
+        }
+    }
+}
+
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 dependencies {
@@ -46,6 +67,7 @@ dependencies {
 }
 
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     def props = [
         version: project.version,
         mod_name: rootProject.findProperty('mod_name'),

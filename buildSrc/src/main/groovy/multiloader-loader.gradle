@@ -77,8 +77,7 @@ publishing {
 
     publications {
         mavenJava(MavenPublication) {
-            def baseId = base.archivesName.get()                 // e.g. beltborne_lanterns-fabric
-            artifactId = "${baseId}-${mcTag}"                    // -> beltborne_lanterns-fabric-mc1.21
+            artifactId = "${rootProject.archives_name}-${project.name}-${mcTag}"  // -> beltborne_lanterns-fabric-mc1.21
 
             if (tasks.findByName('remapJar')) {
                 artifact(tasks.named('remapJar')) {               // runtime jar
