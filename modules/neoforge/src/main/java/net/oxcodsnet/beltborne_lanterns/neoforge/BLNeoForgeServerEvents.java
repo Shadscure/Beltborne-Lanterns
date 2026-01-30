@@ -105,7 +105,7 @@ public final class BLNeoForgeServerEvents {
         if (!event.isWasDeath()) return;
 
         ServerPlayer newPlayer = (ServerPlayer) event.getEntity();
-        boolean keep = oldPlayer.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
+        boolean keep = oldPlayer.serverLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
         BeltLanternServer.handleDeath(oldPlayer, newPlayer, keep);
         // Remove dynamic light from the dying player entity
         DynamicLightsCompat.removeFor(oldPlayer);

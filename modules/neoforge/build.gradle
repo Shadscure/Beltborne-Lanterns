@@ -27,6 +27,24 @@ neoForge {
         server {
             server()
         }
+        clientData {
+            clientData()
+            programArguments.addAll(
+                '--mod', modId,
+                '--all',
+                '--output', file('src/main/generated-client').absolutePath,
+                '--existing', file('src/main/resources').absolutePath
+            )
+        }
+        serverData {
+            serverData()
+            programArguments.addAll(
+                '--mod', modId,
+                '--all',
+                '--output', file('src/main/generated-server').absolutePath,
+                '--existing', file('src/main/resources').absolutePath
+            )
+        }
     }
 
     mods {
@@ -34,6 +52,19 @@ neoForge {
             sourceSet(sourceSets.main)
         }
     }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += file("src/main/generated-client")
+            srcDirs += file("src/main/generated-server")
+        }
+    }
+}
+
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 dependencies {
@@ -46,6 +77,7 @@ dependencies {
 }
 
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     def props = [
         version: project.version,
         mod_name: rootProject.findProperty('mod_name'),
