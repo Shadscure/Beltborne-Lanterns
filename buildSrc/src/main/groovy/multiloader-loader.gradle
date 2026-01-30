@@ -1,0 +1,68 @@
+// Convention plugin for loader modules (fabric, neoforge)
+// Consumes common module sources and bundles them
+
+plugins {
+    id 'java-library'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    withSourcesJar()
+}
+
+// Configurations to consume common module
+configurations {
+    commonJava {
+        canBeResolved = true
+        canBeConsumed = false
+        attributes {
+            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category, Category.LIBRARY))
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, 'common-java'))
+        }
+    }
+    commonResources {
+        canBeResolved = true
+        canBeConsumed = false
+        attributes {
+            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category, Category.LIBRARY))
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, 'common-resources'))
+        }
+    }
+}
+
+dependencies {
+    commonJava project(':modules:common')
+    commonResources project(':modules:common')
+    compileOnly project(':modules:common')
+}
+
+// Include common sources in compilation
+tasks.named('compileJava') {
+    dependsOn configurations.commonJava
+    source configurations.commonJava
+}
+
+// Include common resources in processing
+tasks.named('processResources') {
+    dependsOn configurations.commonResources
+    from(configurations.commonResources) {
+        exclude 'fabric.mod.json'
+        exclude 'META-INF/neoforge.mods.toml'
+        exclude '*.mixins.json'
+    }
+}
+
+// Include common sources in sources jar
+tasks.named('sourcesJar') {
+    dependsOn configurations.commonJava
+    dependsOn configurations.commonResources
+    from configurations.commonJava
+    from configurations.commonResources
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}

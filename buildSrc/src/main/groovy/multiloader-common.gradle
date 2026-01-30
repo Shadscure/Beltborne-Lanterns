@@ -1,0 +1,55 @@
+// Convention plugin for the common module
+// Provides shared code compilation and export configurations
+
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    withSourcesJar()
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+    maven { url = 'https://maven.shedaniel.me/' }
+    maven { url = 'https://maven.gegy.dev' }
+    maven { url = 'https://api.modrinth.com/maven' }
+}
+
+// Configurations to export sources to loader modules
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+        attributes {
+            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category, Category.LIBRARY))
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, 'common-java'))
+        }
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+        attributes {
+            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category, Category.LIBRARY))
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, 'common-resources'))
+        }
+    }
+}
+
+// Export source directories
+artifacts {
+    commonJava(sourceSets.main.java.sourceDirectories.singleFile) {
+        builtBy(tasks.named('classes'))
+    }
+    commonResources(sourceSets.main.resources.sourceDirectories.singleFile)
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}

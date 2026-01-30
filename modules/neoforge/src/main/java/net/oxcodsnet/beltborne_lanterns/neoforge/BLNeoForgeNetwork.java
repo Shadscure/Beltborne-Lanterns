@@ -31,7 +31,7 @@ import java.util.UUID;
  * <p>Runs on both dedicated and integrated servers so the toggle payload is
  * handled in singleplayer as well.</p>
  */
-@EventBusSubscriber(modid = BLMod.MOD_ID)
+@EventBusSubscriber(modid = BLMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public final class BLNeoForgeNetwork {
     private BLNeoForgeNetwork() {}
 
