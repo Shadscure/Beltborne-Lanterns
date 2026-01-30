@@ -11,7 +11,7 @@ import net.oxcodsnet.beltborne_lanterns.BLMod;
 
 import java.util.concurrent.CompletableFuture;
 
-@EventBusSubscriber(modid = BLMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = BLMod.MOD_ID)
 public class BLDataGenerators {
 
     @SubscribeEvent
