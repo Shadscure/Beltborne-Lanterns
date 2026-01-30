@@ -67,3 +67,4 @@ modules/neoforge/run/
 modules/fabric/src/main/generated/.cache
 modules/quilt/src/main/generated/.cache
 modules/neoforge/src/main/generated/.cache
+/modules/fabric/bin/

@@ -4,7 +4,9 @@
   "version": "${version}",
   "name": "${mod_name}",
   "description": "${mod_description}",
-  "authors": ["${mod_authors}"],
+  "authors": [
+    "${mod_authors}"
+  ],
   "license": "${mod_license}",
   "contact": {
     "sources": "${mod_sources}",
@@ -22,11 +24,14 @@
     "client": [
       "net.oxcodsnet.beltborne_lanterns.fabric.client.BLFabricClient"
     ],
-    "lambdynlights:initializer": [
-      "net.oxcodsnet.beltborne_lanterns.common.LambDynLightsInitializer"
-    ],
     "modmenu": [
       "net.oxcodsnet.beltborne_lanterns.fabric.client.BLFabricModMenu"
+    ],
+    "lambdynlights:initializer": [
+      "net.oxcodsnet.beltborne_lanterns.fabric.compat.LambDynLightsInitializer"
+    ],
+    "dynamiclights": [
+      "net.oxcodsnet.beltborne_lanterns.fabric.compat.LambDynLightsInitializer"
     ]
   },
   "mixins": [
