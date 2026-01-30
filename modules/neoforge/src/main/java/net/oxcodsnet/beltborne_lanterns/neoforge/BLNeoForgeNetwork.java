@@ -31,7 +31,7 @@ import java.util.UUID;
  * <p>Runs on both dedicated and integrated servers so the toggle payload is
  * handled in singleplayer as well.</p>
  */
-@EventBusSubscriber(modid = BLMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = BLMod.MOD_ID)
 public final class BLNeoForgeNetwork {
     private BLNeoForgeNetwork() {}
 
@@ -78,7 +78,7 @@ public final class BLNeoForgeNetwork {
                 BeltSyncPayload.CODEC,
                 (payload, ctx) -> {
                     UUID uuid = payload.playerUuid();
-                    Item lamp = payload.lampId() != null ? BuiltInRegistries.ITEM.get(payload.lampId()) : null;
+                    Item lamp = payload.lampId() != null ? BuiltInRegistries.ITEM.getValue(payload.lampId()) : null;
                     ClientBeltPlayers.setLamp(uuid, lamp);
                 }
         );
