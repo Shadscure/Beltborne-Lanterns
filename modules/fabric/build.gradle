@@ -72,7 +72,7 @@ dependencies {
     modCompileOnly "dev.lambdaurora.lambdynamiclights:lambdynamiclights-api:${rootProject.lambdynamiclights_version}"
 
     // LambDynamicLights (runtime only for testing)
-    modLocalRuntime "dev.lambdaurora.lambdynamiclights:lambdynamiclights-runtime:${rootProject.lambdynamiclights_version}"
+    //modLocalRuntime "dev.lambdaurora.lambdynamiclights:lambdynamiclights-runtime:${rootProject.lambdynamiclights_version}"
 }
 
 processResources {
