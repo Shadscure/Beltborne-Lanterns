@@ -19,7 +19,7 @@ repositories {
 
 loom {
     mixin {
-        defaultRefmapName = "${modId}.refmap.json"
+        defaultRefmapName = "beltborne_lanterns-fabric.refmap.json"
     }
 
     runs {
@@ -36,6 +36,22 @@ loom {
             runDir("run/server")
         }
     }
+}
+
+fabricApi {
+    configureDataGeneration()
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += file("src/main/generated")
+        }
+    }
+}
+
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 dependencies {
@@ -60,6 +76,7 @@ dependencies {
 }
 
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     def props = [
         version: project.version,
         mod_id: rootProject.findProperty('mod_id'),

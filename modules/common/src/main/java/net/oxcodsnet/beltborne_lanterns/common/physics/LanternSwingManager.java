@@ -17,9 +17,9 @@ public final class LanternSwingManager {
 
     // Coupling gains → forcing (rad/s^2)
     private static final float K_YAW = 3.2f;         // yaw rate -> lateral sway (Z axis)
-    private static final float K_HSPEED = 0.20f;     // small forward lean with speed
-    private static final float K_HACCEL = 1.7f;      // forward accel -> fore-aft sway (X axis)
-    private static final float K_YACCEL = 0.30f;     // vertical accel -> small extra fore-aft
+    private static final float K_HSPEED = 0.15f;     // small forward lean with speed
+    private static final float K_HACCEL = 1.25f;     // forward accel -> fore-aft sway (X axis)
+    private static final float K_YACCEL = 0.22f;     // vertical accel -> small extra fore-aft
     private static final float K_STRAFE_A = 1.4f;    // strafe accel -> lateral sway
     private static final float K_STRAFE_V = 0.25f;   // strafe speed -> constant slight lean
 
@@ -28,8 +28,8 @@ public final class LanternSwingManager {
     private static final float IMPULSE_LAND_X = +1.8f; // kick forwards on landing
     private static final float IMPULSE_CROUCH_X = +0.6f; // small forward dip on crouch
     private static final float IMPULSE_UNCROUCH_X = -0.4f; // small recovery on release
-    private static final float IMPULSE_START_MOVE_X = -0.7f; // when starting to move: slight back
-    private static final float IMPULSE_STOP_MOVE_X  = +0.5f; // when stopping: slight forward
+    private static final float IMPULSE_START_MOVE_X = -0.55f; // when starting to move: slight back
+    private static final float IMPULSE_STOP_MOVE_X  = +0.4f;  // when stopping: slight forward
 
     // Event detection thresholds
     private static final double MOVE_THRESHOLD_BPS = 1.6;   // blocks/sec, for start/stop impulses
@@ -61,10 +61,22 @@ public final class LanternSwingManager {
         float yawRateDegPerSec = wrapDegrees(yaw - kin.prevYaw) / Math.max(dtSec, 1e-4f);
         float yawRateRadPerSec = (float) Math.toRadians(yawRateDegPerSec);
 
-        // Velocity components
-        double vx = p.getDeltaMovement().x; // blocks/tick
-        double vz = p.getDeltaMovement().z;
-        double vy = p.getDeltaMovement().y;
+        double px = p.getX();
+        double py = p.getY();
+        double pz = p.getZ();
+
+        double vxTick = px - kin.prevX;
+        double vyTick = py - kin.prevY;
+        double vzTick = pz - kin.prevZ;
+        if (!kin.posInit) {
+            vxTick = vyTick = vzTick = 0.0;
+            kin.posInit = true;
+        }
+
+        // Velocity components (per tick)
+        double vx = vxTick;
+        double vz = vzTick;
+        double vy = vyTick;
 
         // Convert to per-second scales where needed
         double hSpeedPerSec = Math.hypot(vx, vz) * 20.0;
@@ -139,6 +151,9 @@ public final class LanternSwingManager {
         kin.prevVFwdPerSec = vFwdPerSec;
         kin.prevVRightPerSec = vRightPerSec;
         kin.prevMoving = moving;
+        kin.prevX = px;
+        kin.prevY = py;
+        kin.prevZ = pz;
 
         KIN.put(id, kin);
         STATES.put(id, state);
@@ -190,5 +205,9 @@ public final class LanternSwingManager {
         boolean prevMoving = false;
         float baseXDegSmoothed = 0f;     // smoothed base X for crouch blending
         boolean baseInit = false;
+        double prevX;
+        double prevY;
+        double prevZ;
+        boolean posInit = false;
     }
 }

@@ -42,13 +42,15 @@ public final class BLRuntimeDataPack {
             }
 
             // Compose files
-            String metaJson = "{\n" +
-                    "  \"pack\": {\n" +
-                    "    \"pack_format\": 61,\n" +
-                    "    \"supported_formats\": { \"min_inclusive\": 1, \"max_inclusive\": 999 },\n" +
-                    "    \"description\": \"Beltborne Lanterns runtime tags generated from config\"\n" +
-                    "  }\n" +
-                    "}\n";
+            String metaJson = """
+                    {
+                      "pack": {
+                        "description": "Beltborne Lanterns runtime tags generated from config",
+                        "min_format": 88,
+                        "max_format": 88
+                      }
+                    }
+                    """;
 
             StringBuilder sb = new StringBuilder();
             sb.append("{\n  \"replace\": false,\n  \"values\": [\n");
