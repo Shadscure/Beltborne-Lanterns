@@ -38,6 +38,22 @@ loom {
     }
 }
 
+fabricApi {
+    configureDataGeneration()
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += file("src/main/generated")
+        }
+    }
+}
+
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
     minecraft "net.minecraft:minecraft:${rootProject.minecraft_version}"
     mappings loom.officialMojangMappings()
@@ -60,6 +76,7 @@ dependencies {
 }
 
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     def props = [
         version: project.version,
         mod_id: rootProject.findProperty('mod_id'),

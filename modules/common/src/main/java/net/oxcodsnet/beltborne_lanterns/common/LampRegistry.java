@@ -77,7 +77,7 @@ public final class LampRegistry {
         cfg.extraLampLight.forEach(entry -> {
             ResourceLocation id = ResourceLocation.tryParse(entry.id);
             if (id == null) return;
-            Item item = BuiltInRegistries.ITEM.get(id);
+            Item item = BuiltInRegistries.ITEM.getValue(id);
             if (item == Items.AIR) return;
             if (!(item instanceof BlockItem blockItem)) return;
             BlockState state = blockItem.getBlock().defaultBlockState();
@@ -131,7 +131,7 @@ public final class LampRegistry {
     }
 
     public static Item getById(ResourceLocation id) {
-        return BuiltInRegistries.ITEM.get(id);
+        return BuiltInRegistries.ITEM.getValue(id);
     }
 
     public static Set<Item> items() {
