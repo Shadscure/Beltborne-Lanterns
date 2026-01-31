@@ -56,7 +56,7 @@ public final class DynamicLightsCompat {
                     } else if ("hashCode".equals(name)) {
                         return Integer.valueOf(System.identityHashCode(p));
                     } else if ("toString".equals(name)) {
-                        return "BeltborneDLSource{" + player.getGameProfile().getName() + ":" + player.getUUID() + "}";
+                        return "BeltborneDLSource{" + player.getGameProfile().name() + ":" + player.getUUID() + "}";
                     }
                     if ("getAttachmentEntity".equals(name)) {
                         return player; // runtime-mapped entity instance

@@ -15,6 +15,11 @@ repositories {
     maven { url = 'https://maven.shedaniel.me/' }
     maven { url = 'https://maven.neoforged.net/releases/' }
     maven { url = 'https://maven.gegy.dev' }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content { includeGroup "maven.modrinth" }
+    }
 }
 
 neoForge {
@@ -27,6 +32,24 @@ neoForge {
         server {
             server()
         }
+        clientData {
+            clientData()
+            programArguments.addAll(
+                '--mod', modId,
+                '--all',
+                '--output', file('src/main/generated-client').absolutePath,
+                '--existing', file('src/main/resources').absolutePath
+            )
+        }
+        serverData {
+            serverData()
+            programArguments.addAll(
+                '--mod', modId,
+                '--all',
+                '--output', file('src/main/generated-server').absolutePath,
+                '--existing', file('src/main/resources').absolutePath
+            )
+        }
     }
 
     mods {
@@ -36,16 +59,37 @@ neoForge {
     }
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDirs += file("src/main/generated-client")
+            srcDirs += file("src/main/generated-server")
+        }
+    }
+}
+
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
     // Cloth Config
     implementation "me.shedaniel.cloth:cloth-config-neoforge:${rootProject.cloth_config_version}"
 
-    // LambDynamicLights API (compile-only, mojmap variant for common code)
-    // Note: For testing with LambDynamicLights on NeoForge, install the mod manually from Modrinth
+    // LambDynamicLights API (compile-only for integration code)
     compileOnly "dev.lambdaurora.lambdynamiclights:lambdynamiclights-api:${rootProject.lambdynamiclights_version}:mojmap"
+
+    // LambDynamicLights full mod for testing dynamic lighting
+    //runtimeOnly "maven.modrinth:lambdynamiclights:${rootProject.lambdynamiclights_version}"
+    runtimeOnly("dev.lambdaurora.lambdynamiclights:lambdynamiclights-runtime:${rootProject.lambdynamiclights_version}") {
+        attributes {
+            attribute(Attribute.of("net.minecraft.mappings", String), "mojmap")
+        }
+    }
 }
 
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     def props = [
         version: project.version,
         mod_name: rootProject.findProperty('mod_name'),

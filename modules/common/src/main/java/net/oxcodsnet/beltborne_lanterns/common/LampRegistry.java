@@ -46,6 +46,7 @@ public final class LampRegistry {
         // Built-in vanilla lamps
         register(Items.LANTERN, Blocks.LANTERN.defaultBlockState().setValue(BlockStateProperties.HANGING, false));
         register(Items.SOUL_LANTERN, Blocks.SOUL_LANTERN.defaultBlockState().setValue(BlockStateProperties.HANGING, false));
+        registerCopperLanterns();
 
         // Dynamically register any additional tagged items (MC 1.21+: iterateEntries)
         try {
@@ -77,7 +78,7 @@ public final class LampRegistry {
         cfg.extraLampLight.forEach(entry -> {
             ResourceLocation id = ResourceLocation.tryParse(entry.id);
             if (id == null) return;
-            Item item = BuiltInRegistries.ITEM.get(id);
+            Item item = BuiltInRegistries.ITEM.getValue(id);
             if (item == Items.AIR) return;
             if (!(item instanceof BlockItem blockItem)) return;
             BlockState state = blockItem.getBlock().defaultBlockState();
@@ -94,6 +95,31 @@ public final class LampRegistry {
         if (LAMPS.containsKey(Items.SOUL_LANTERN)) builtin++;
         int extras = Math.max(0, total - builtin);
         BLMod.LOGGER.info("Lamp registry ready: {} items ({} builtin, {} extra)", total, builtin, extras);
+    }
+
+    private static void registerCopperLanterns() {
+        registerCopperVariant("copper_lantern");
+        registerCopperVariant("exposed_copper_lantern");
+        registerCopperVariant("weathered_copper_lantern");
+        registerCopperVariant("oxidized_copper_lantern");
+        registerCopperVariant("waxed_copper_lantern");
+        registerCopperVariant("waxed_exposed_copper_lantern");
+        registerCopperVariant("waxed_weathered_copper_lantern");
+        registerCopperVariant("waxed_oxidized_copper_lantern");
+    }
+
+    private static void registerCopperVariant(String path) {
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(ResourceLocation.DEFAULT_NAMESPACE, path);
+        Item item = BuiltInRegistries.ITEM.getValue(id);
+        if (!(item instanceof BlockItem blockItem)) {
+            BLMod.LOGGER.warn("Expected copper lantern item {}, but it was not found or not a block item", id);
+            return;
+        }
+        BlockState state = blockItem.getBlock().defaultBlockState();
+        if (state.hasProperty(BlockStateProperties.HANGING)) {
+            state = state.setValue(BlockStateProperties.HANGING, false);
+        }
+        register(item, state);
     }
 
     private static int clampLuminance(int lum) {
@@ -131,10 +157,11 @@ public final class LampRegistry {
     }
 
     public static Item getById(ResourceLocation id) {
-        return BuiltInRegistries.ITEM.get(id);
+        return BuiltInRegistries.ITEM.getValue(id);
     }
 
     public static Set<Item> items() {
         return Collections.unmodifiableSet(LAMPS.keySet());
     }
+
 }

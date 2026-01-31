@@ -1,5 +1,7 @@
 package net.oxcodsnet.beltborne_lanterns.common.server;
 
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
@@ -7,15 +9,20 @@ import net.minecraft.world.item.ItemStack;
 import net.oxcodsnet.beltborne_lanterns.common.BeltState;
 import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
 import net.oxcodsnet.beltborne_lanterns.common.persistence.BeltLanternSave;
+import java.util.Objects;
 
 /**
  * Common server-side logic for toggling the belt lamp state.
  *
  * Platform-specific code should call {@link #toggleLantern(ServerPlayer, ItemStack)}
  * then perform its own broadcasting.
- */
+    */
 public final class BeltLanternServer {
     private BeltLanternServer() {}
+
+    private static MinecraftServer server(ServerPlayer player) {
+        return Objects.requireNonNull(((ServerLevel) player.level()).getServer(), "Missing server instance");
+    }
 
     /**
      * Toggles the belt lamp for the player and updates persistence + inventory.
@@ -40,7 +47,7 @@ public final class BeltLanternServer {
             // Store the exact stack (count=1) to preserve NBT/enchantments/etc.
             BeltState.setLamp(player, equipped);
             // Persist full stack including NBT for cross-restart restore
-            BeltLanternSave.get(player.getServer()).set(player.getUUID(), equipped);
+            BeltLanternSave.get(server(player)).set(player.getUUID(), equipped);
             return item;
         } else {
             if (!creative) {
@@ -49,7 +56,7 @@ public final class BeltLanternServer {
                 ItemStack toReturn = (stored != null && !stored.isEmpty()) ? stored : new ItemStack(current);
 
                 var inventory = player.getInventory();
-                int selectedSlot = inventory.selected;
+                int selectedSlot = inventory.getSelectedSlot();
                 boolean placedInSelected = false;
 
                 if (selectedSlot >= 0 && selectedSlot < Inventory.getSelectionSize()) {
@@ -80,7 +87,7 @@ public final class BeltLanternServer {
             }
             // Clear state and persistence
             BeltState.setLamp(player, (ItemStack) null);
-            BeltLanternSave.get(player.getServer()).set(player.getUUID(), (ItemStack) null);
+            BeltLanternSave.get(server(player)).set(player.getUUID(), (ItemStack) null);
             return null;
         }
     }
@@ -109,7 +116,7 @@ public final class BeltLanternServer {
             player.drop(stack, false);
         }
         BeltState.setLamp(player, (ItemStack) null);
-        BeltLanternSave.get(player.getServer()).set(player.getUUID(), (ItemStack) null);
+        BeltLanternSave.get(server(player)).set(player.getUUID(), (ItemStack) null);
         return null;
     }
 
@@ -129,7 +136,7 @@ public final class BeltLanternServer {
             ItemStack stored = BeltState.getLampStack(oldPlayer);
             // Transfer the exact stack (including NBT) to the new player
             BeltState.setLamp(newPlayer, stored);
-            BeltLanternSave.get(newPlayer.getServer()).set(newPlayer.getUUID(), stored);
+            BeltLanternSave.get(server(newPlayer)).set(newPlayer.getUUID(), stored);
             return;
         }
         // Drop from old player's position and clear state
@@ -140,7 +147,7 @@ public final class BeltLanternServer {
             oldPlayer.drop(new ItemStack(lamp), false);
         }
         BeltState.setLamp(oldPlayer, (ItemStack) null);
-        BeltLanternSave.get(oldPlayer.getServer()).set(oldPlayer.getUUID(), (ItemStack) null);
+        BeltLanternSave.get(server(oldPlayer)).set(oldPlayer.getUUID(), (ItemStack) null);
         // Ensure new player does not carry over state
         BeltState.setLamp(newPlayer, (ItemStack) null);
     }

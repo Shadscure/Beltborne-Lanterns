@@ -8,9 +8,8 @@ neoForge {
 }
 
 dependencies {
-    // Mixin for compile-time processing
+    // Mixin compile-only (processing happens in loader modules with proper mappings)
     compileOnly "org.spongepowered:mixin:0.8.7"
-    annotationProcessor "org.spongepowered:mixin:0.8.7:processor"
 
     // Cloth Config API (compile-only in common, using NeoForge variant for Mojmap compatibility)
     compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${rootProject.cloth_config_version}"
