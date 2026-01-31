@@ -2,16 +2,16 @@ package net.oxcodsnet.beltborne_lanterns.neoforge.datagen;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.common.data.BlockTagCopyingItemTagProvider;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
 
 import java.util.concurrent.CompletableFuture;
 
-public class BLItemTagProvider extends ItemTagsProvider {
+public class BLItemTagProvider extends BlockTagCopyingItemTagProvider {
 
     public BLItemTagProvider(
             PackOutput output,
