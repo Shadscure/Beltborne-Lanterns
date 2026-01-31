@@ -4,7 +4,7 @@ import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfig;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -42,7 +42,7 @@ public final class BLNeoForgeClient {
 
     // Keybindings
     private static final KeyMapping.Category BELTBORNE_CATEGORY =
-            KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(BLMod.MOD_ID, "beltborne_lanterns"));
+            KeyMapping.Category.register(Identifier.fromNamespaceAndPath(BLMod.MOD_ID, "beltborne_lanterns"));
     private static KeyMapping openConfigKey;
     private static KeyMapping toggleDebugKey;
     private static KeyMapping openDebugEditorKey;

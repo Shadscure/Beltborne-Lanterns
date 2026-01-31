@@ -3,13 +3,13 @@ package net.oxcodsnet.beltborne_lanterns.neoforge;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Optional;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
@@ -81,9 +81,9 @@ public final class BLNeoForgeServerEvents {
         // If on a dedicated server, send its lamp config to the joining player.
         // In single player, the client's config is trusted as the source of truth.
         if (server.isDedicatedServer()) {
-            var lampMap = new java.util.LinkedHashMap<ResourceLocation, Integer>();
+            var lampMap = new java.util.LinkedHashMap<Identifier, Integer>();
             BLLampConfigAccess.get().extraLampLight.forEach(entry -> {
-                ResourceLocation id = ResourceLocation.tryParse(entry.id);
+                Identifier id = Identifier.tryParse(entry.id);
                 if (id != null) lampMap.put(id, entry.luminance);
             });
             PacketDistributor.sendToPlayer(joining, new LampConfigSyncPayload(lampMap));
@@ -110,7 +110,7 @@ public final class BLNeoForgeServerEvents {
         if (!event.isWasDeath()) return;
 
         ServerPlayer newPlayer = (ServerPlayer) event.getEntity();
-        boolean keep = oldPlayer.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
+        boolean keep = oldPlayer.level().getGameRules().get(GameRules.KEEP_INVENTORY);
         BeltLanternServer.handleDeath(oldPlayer, newPlayer, keep);
         // Remove dynamic light from the dying player entity
         DynamicLightsCompat.removeFor(oldPlayer);

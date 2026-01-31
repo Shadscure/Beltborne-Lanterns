@@ -3,11 +3,11 @@ package net.oxcodsnet.beltborne_lanterns.fabric;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.oxcodsnet.beltborne_lanterns.common.BeltState;
 import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
@@ -77,9 +77,9 @@ public final class BLFabricServerEvents {
             // If on a dedicated server, send its lamp config to the joining player.
             // In single player, the client's config is trusted as the source of truth.
             if (server.isDedicatedServer()) {
-                var lampMap = new LinkedHashMap<ResourceLocation, Integer>();
+                var lampMap = new LinkedHashMap<Identifier, Integer>();
                 BLLampConfigAccess.get().extraLampLight.forEach(entry -> {
-                    ResourceLocation id = ResourceLocation.tryParse(entry.id);
+                    Identifier id = Identifier.tryParse(entry.id);
                     if (id != null) lampMap.put(id, entry.luminance);
                 });
                 ServerPlayNetworking.send(joining, new LampConfigSyncPayload(lampMap));
@@ -102,7 +102,7 @@ public final class BLFabricServerEvents {
         // Handle lamp drop/persistence on death and sync after respawn
         ServerPlayerEvents.COPY_FROM.register((oldPlayer, newPlayer, alive) -> {
             if (alive) return;
-            boolean keep = oldPlayer.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
+            boolean keep = oldPlayer.level().getGameRules().get(GameRules.KEEP_INVENTORY);
             BeltLanternServer.handleDeath(oldPlayer, newPlayer, keep);
         });
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {

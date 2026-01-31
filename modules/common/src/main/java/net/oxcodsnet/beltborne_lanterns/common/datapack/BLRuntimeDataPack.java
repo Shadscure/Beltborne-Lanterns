@@ -1,6 +1,6 @@
 package net.oxcodsnet.beltborne_lanterns.common.datapack;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
@@ -36,7 +36,7 @@ public final class BLRuntimeDataPack {
             Set<String> values = new LinkedHashSet<>();
             for (BLClientConfig.ExtraLampEntry e : BLLampConfigAccess.get().extraLampLight) {
                 if (e == null || e.id == null) continue;
-                ResourceLocation id = ResourceLocation.tryParse(e.id);
+                Identifier id = Identifier.tryParse(e.id);
                 if (id == null) continue;
                 values.add(id.toString());
             }

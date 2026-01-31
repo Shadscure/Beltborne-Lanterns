@@ -159,8 +159,7 @@ public class LanternDebugScreen extends Screen {
     private static boolean isControlDown() {
         var window = Minecraft.getInstance().getWindow();
         if (InputQuirks.REPLACE_CTRL_KEY_WITH_CMD_KEY) {
-            return InputConstants.isKeyDown(window, InputQuirks.EDIT_SHORTCUT_KEY_LEFT)
-                    || InputConstants.isKeyDown(window, InputQuirks.EDIT_SHORTCUT_KEY_RIGHT);
+            return InputConstants.isKeyDown(window, InputQuirks.EDIT_SHORTCUT_KEY_MODIFIER);
         }
         return InputConstants.isKeyDown(window, InputConstants.KEY_LCONTROL)
                 || InputConstants.isKeyDown(window, InputConstants.KEY_RCONTROL);
