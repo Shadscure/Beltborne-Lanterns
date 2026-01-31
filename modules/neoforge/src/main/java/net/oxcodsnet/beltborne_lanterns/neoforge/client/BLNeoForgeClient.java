@@ -4,9 +4,7 @@ import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfig;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.client.resources.PlayerSkin.Model;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -14,16 +12,13 @@ import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.oxcodsnet.beltborne_lanterns.common.LambDynLightsCompat;
 import net.oxcodsnet.beltborne_lanterns.common.client.BLClientAbstractions;
 import net.oxcodsnet.beltborne_lanterns.common.client.ClientBeltPlayers;
-import net.oxcodsnet.beltborne_lanterns.common.client.LanternBeltFeatureRenderer;
 import net.oxcodsnet.beltborne_lanterns.common.client.LanternClientLogic;
 import net.oxcodsnet.beltborne_lanterns.common.client.LanternClientScreens;
 import net.oxcodsnet.beltborne_lanterns.common.client.ui.LanternDebugScreen;
@@ -39,13 +34,15 @@ import net.oxcodsnet.beltborne_lanterns.common.physics.LanternSwingManager;
 import com.mojang.blaze3d.platform.InputConstants;
 import java.util.UUID;
 
-@EventBusSubscriber(modid = BLMod.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = BLMod.MOD_ID, value = Dist.CLIENT)
 public final class BLNeoForgeClient {
     // no per-loader state; use common ClientBeltPlayers
 
     private BLNeoForgeClient() {}
 
     // Keybindings
+    private static final KeyMapping.Category BELTBORNE_CATEGORY =
+            KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(BLMod.MOD_ID, "beltborne_lanterns"));
     private static KeyMapping openConfigKey;
     private static KeyMapping toggleDebugKey;
     private static KeyMapping openDebugEditorKey;
@@ -74,22 +71,22 @@ public final class BLNeoForgeClient {
         openConfigKey = new KeyMapping(
                 "key.beltborne_lanterns.open_config",
                 InputConstants.Type.KEYSYM, org.lwjgl.glfw.GLFW.GLFW_KEY_L,
-                "category.beltborne_lanterns"
+                BELTBORNE_CATEGORY
         );
         toggleDebugKey = new KeyMapping(
                 "key.beltborne_lanterns.toggle_debug",
                 InputConstants.Type.KEYSYM, org.lwjgl.glfw.GLFW.GLFW_KEY_K,
-                "category.beltborne_lanterns"
+                BELTBORNE_CATEGORY
         );
         openDebugEditorKey = new KeyMapping(
                 "key.beltborne_lanterns.open_debug",
                 InputConstants.Type.KEYSYM, org.lwjgl.glfw.GLFW.GLFW_KEY_P,
-                "category.beltborne_lanterns"
+                BELTBORNE_CATEGORY
         );
         toggleLanternKey = new KeyMapping(
                 "key.beltborne_lanterns.toggle_lantern",
                 InputConstants.Type.KEYSYM, org.lwjgl.glfw.GLFW.GLFW_KEY_B,
-                "category.beltborne_lanterns"
+                BELTBORNE_CATEGORY
         );
         event.register(openConfigKey);
         event.register(toggleDebugKey);
@@ -104,17 +101,6 @@ public final class BLNeoForgeClient {
         } catch (Throwable ignored) {}
 
         BLMod.LOGGER.info("Client ready [NeoForge].");
-    }
-
-    @SubscribeEvent
-    public static void addLayers(EntityRenderersEvent.AddLayers event) {
-        // Add our belt lantern feature to all available player skins
-        for (var skin : event.getSkins()) {
-            var renderer = event.getSkin(skin);
-            if (renderer instanceof PlayerRenderer per) {
-                per.addLayer(new LanternBeltFeatureRenderer(per));
-            }
-        }
     }
 
     @EventBusSubscriber(modid = BLMod.MOD_ID, value = Dist.CLIENT)

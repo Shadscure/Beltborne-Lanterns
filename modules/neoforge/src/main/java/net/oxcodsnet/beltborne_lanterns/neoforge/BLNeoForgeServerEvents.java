@@ -34,6 +34,9 @@ import net.oxcodsnet.beltborne_lanterns.common.DynamicLightsCompat;
 public final class BLNeoForgeServerEvents {
     private BLNeoForgeServerEvents() {}
 
+    private static MinecraftServer server(ServerPlayer player) {
+        return Objects.requireNonNull(((ServerLevel) player.level()).getServer(), "Missing server instance");
+    }
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent e) {
@@ -53,7 +56,7 @@ public final class BLNeoForgeServerEvents {
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer joining)) return;
-        MinecraftServer server = joining.getServer();
+        MinecraftServer server = server(joining);
         // Restore from persistent save (full stack with NBT) and broadcast
         var persistedStack = BeltLanternSave.get(server).getStack(joining.getUUID());
 
@@ -94,7 +97,7 @@ public final class BLNeoForgeServerEvents {
     public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer leaving)) return;
         // Persist full stack with NBT on disconnect
-        BeltLanternSave.get(leaving.getServer()).set(leaving.getUUID(), BeltState.getLampStack(leaving));
+        BeltLanternSave.get(server(leaving)).set(leaving.getUUID(), BeltState.getLampStack(leaving));
         // Clean up dynamic light source when leaving
         DynamicLightsCompat.removeFor(leaving);
     }
