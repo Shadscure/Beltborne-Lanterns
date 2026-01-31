@@ -16,7 +16,7 @@ logoFile = "assets/beltborne_lanterns/icon.png"
 [[dependencies.beltborne_lanterns]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.0,)"
+versionRange = "[21.1,)"
 ordering = "NONE"
 side = "BOTH"
 
@@ -40,6 +40,9 @@ side = "BOTH"
 #versionRange = "[13.0.8,)"
 #ordering = "AFTER"
 #side = "BOTH"
+
+[[mixins]]
+config = "beltborne_lanterns.neoforge.mixins.json"
 
 [modproperties.beltborne_lanterns."yumi:entrypoints"]
 "lambdynlights:initializer" = "net.oxcodsnet.beltborne_lanterns.common.LambDynLightsInitializer"

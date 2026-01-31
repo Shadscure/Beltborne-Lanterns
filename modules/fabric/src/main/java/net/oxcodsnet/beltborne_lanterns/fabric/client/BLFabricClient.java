@@ -65,7 +65,7 @@ public final class BLFabricClient implements ClientModInitializer {
         // Register network receiver: updates local client set
         ClientPlayNetworking.registerGlobalReceiver(BeltSyncPayload.ID, (payload, context) -> {
             UUID uuid = payload.playerUuid();
-            Item lamp = payload.lampId() != null ? BuiltInRegistries.ITEM.get(payload.lampId()) : null;
+            Item lamp = payload.lampId() != null ? BuiltInRegistries.ITEM.getValue(payload.lampId()) : null;
             Minecraft.getInstance().execute(() -> {
                 ClientBeltPlayers.setLamp(uuid, lamp);
             });
