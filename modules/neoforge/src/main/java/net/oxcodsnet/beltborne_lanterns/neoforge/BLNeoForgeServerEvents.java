@@ -1,8 +1,10 @@
 package net.oxcodsnet.beltborne_lanterns.neoforge;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 import java.util.Optional;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
