@@ -6,6 +6,9 @@ plugins {
     id 'maven-publish'
 }
 
+// groupId: add platform suffix (e.g. net.oxcodsnet.beltborne_lanterns.common)
+group = "${rootProject.maven_group}.common"
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
@@ -52,4 +55,48 @@ artifacts {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.release = 21
+}
+
+// Maven publishing configuration
+publishing {
+    def mcTag = "mc" + rootProject.minecraft_version
+
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId = "${rootProject.archives_name}-common-${mcTag}"
+
+            pom {
+                name = "${rootProject.mod_name} - Common"
+                description = rootProject.findProperty('mod_description') ?: ''
+            }
+        }
+    }
+
+    // Repository from .env / gradle.properties (identical to architectury-loom)
+    repositories {
+        def repoUrl = rootProject.ext.resolveMavenRepoUrl()
+        if (repoUrl) {
+            maven {
+                name = rootProject.ext.resolveMavenRepoName()
+                url = uri(repoUrl)
+
+                def user  = rootProject.ext.resolveMavenRepoUsername()
+                def pass  = rootProject.ext.resolveMavenRepoPassword()
+                def token = rootProject.ext.resolveMavenRepoToken()
+
+                if ((user && pass) || token) {
+                    credentials {
+                        if (user && pass) {
+                            username = user
+                            password = pass
+                        } else {
+                            username = user ?: 'token'
+                            password = token
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
