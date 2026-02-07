@@ -71,43 +71,13 @@ tasks.withType(JavaCompile).configureEach {
     options.release = 21
 }
 
-// Maven publishing configuration (identical to architectury-loom)
+// Maven publishing configuration
 publishing {
     def mcTag = "mc" + rootProject.minecraft_version
 
     publications {
         mavenJava(MavenPublication) {
-            artifactId = "${rootProject.archives_name}-${project.name}-${mcTag}"  // -> beltborne_lanterns-fabric-mc1.21
-
-            if (tasks.findByName('remapJar')) {
-                artifact(tasks.named('remapJar')) {               // runtime jar
-                    builtBy(tasks.named('remapJar'))
-                }
-
-                if (tasks.findByName('remapSourcesJar')) {
-                    artifact(tasks.named('remapSourcesJar')) {     // sources
-                        classifier = "sources"
-                        builtBy(tasks.named('remapSourcesJar'))
-                    }
-                } else if (tasks.findByName('sourcesJar')) {
-                    artifact(tasks.named('sourcesJar')) {
-                        classifier = "sources"
-                        builtBy(tasks.named('sourcesJar'))
-                    }
-                }
-            } else {
-                if (tasks.findByName('jar')) {
-                    artifact(tasks.named('jar')) {                 // runtime jar
-                        builtBy(tasks.named('jar'))
-                    }
-                }
-                if (tasks.findByName('sourcesJar')) {
-                    artifact(tasks.named('sourcesJar')) {          // sources
-                        classifier = "sources"
-                        builtBy(tasks.named('sourcesJar'))
-                    }
-                }
-            }
+            artifactId = "${rootProject.archives_name}-${project.name}-${mcTag}"
         }
     }
 
@@ -133,6 +103,47 @@ publishing {
                             password = token
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+// Defer artifact configuration until all plugins (e.g. fabric-loom) are applied
+afterEvaluate {
+    publishing.publications.mavenJava {
+        if (tasks.findByName('remapJar')) {
+            // Fabric: remapJar is the main artifact (intermediary-mapped)
+            artifact(tasks.named('remapJar')) {
+                builtBy(tasks.named('remapJar'))
+            }
+            // dev jar for dependents that compile against Mojmap
+            artifact(tasks.named('jar')) {
+                classifier = "dev"
+                builtBy(tasks.named('jar'))
+            }
+            if (tasks.findByName('remapSourcesJar')) {
+                artifact(tasks.named('remapSourcesJar')) {
+                    classifier = "sources"
+                    builtBy(tasks.named('remapSourcesJar'))
+                }
+            } else if (tasks.findByName('sourcesJar')) {
+                artifact(tasks.named('sourcesJar')) {
+                    classifier = "sources"
+                    builtBy(tasks.named('sourcesJar'))
+                }
+            }
+        } else {
+            // NeoForge / Common: no remapJar, standard jar + sources
+            if (tasks.findByName('jar')) {
+                artifact(tasks.named('jar')) {
+                    builtBy(tasks.named('jar'))
+                }
+            }
+            if (tasks.findByName('sourcesJar')) {
+                artifact(tasks.named('sourcesJar')) {
+                    classifier = "sources"
+                    builtBy(tasks.named('sourcesJar'))
                 }
             }
         }
