@@ -1,3 +1,3 @@
 ## Changelog
-### ✨ Improvements
-- Added **Sodium Dynamic Lights** compatibility (technical support only, issues will be redirected to LambDynamicLights).
+### Bug Fixes
+- Fixed lantern duplication on death when compatibility layer addons (e.g. Accessories Layer) manage their own inventory on death.
