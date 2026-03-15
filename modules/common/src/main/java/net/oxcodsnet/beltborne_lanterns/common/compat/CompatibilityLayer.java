@@ -51,4 +51,13 @@ public interface CompatibilityLayer {
     default Optional<ItemStack> getBeltStack(ServerPlayer player) {
         return Optional.empty();
     }
+
+    /**
+     * Whether this compatibility layer handles item dropping/preservation on death.
+     * If true, BL core will skip its own death handling logic (drop + state clear),
+     * deferring to the compatibility layer.
+     */
+    default boolean handlesItemOnDeath() {
+        return false;
+    }
 }
