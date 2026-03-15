@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.oxcodsnet.beltborne_lanterns.common.BeltState;
 import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
 import net.oxcodsnet.beltborne_lanterns.common.persistence.BeltLanternSave;
+import net.oxcodsnet.beltborne_lanterns.common.compat.CompatibilityLayerRegistry;
 import java.util.Objects;
 
 /**
@@ -104,6 +105,11 @@ public final class BeltLanternServer {
     public static Item handleDeath(ServerPlayer player, boolean keepInventory) {
         Item lamp = BeltState.getLamp(player);
         if (lamp == null) return null;
+        for (var layer : CompatibilityLayerRegistry.getLayers()) {
+            if (layer.handlesItemOnDeath()) {
+                return null;
+            }
+        }
         if (keepInventory) {
             return lamp;
         }
@@ -131,6 +137,11 @@ public final class BeltLanternServer {
             // Ensure new player has no stale state
             BeltState.setLamp(newPlayer, (ItemStack) null);
             return;
+        }
+        for (var layer : CompatibilityLayerRegistry.getLayers()) {
+            if (layer.handlesItemOnDeath()) {
+                return;
+            }
         }
         if (keepInventory) {
             ItemStack stored = BeltState.getLampStack(oldPlayer);
