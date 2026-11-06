@@ -57,17 +57,16 @@ Need it back in your hands? Press **B** again. 💡
 
 <table>
   <tr>
-    <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo1.webp" alt="demo 1" width="380"></td>
-    <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo2.webp" alt="demo 2" width="380"></td>
-  
+    <td><img src="https://raw.githubusercontent.com/Shadscure/Beltborne-Lanterns/refs/heads/1.21-multiloader/demo/demo1.webp" alt="demo 1" width="380"></td>
+    <td><img src="https://raw.githubusercontent.com/Shadscure/Beltborne-Lanterns/refs/heads/1.21-multiloader/demo/demo2.webp" alt="demo 2" width="380"></td>
   </tr>
   <tr>
-     <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo3.webp" alt="demo 3" width="380"></td>
-     <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo4.webp" alt="demo 4" width="380"></td>
+     <td><img src="https://raw.githubusercontent.com/Shadscure/Beltborne-Lanterns/refs/heads/1.21-multiloader/demo/demo3.webp" alt="demo 3" width="380"></td>
+     <td><img src="https://raw.githubusercontent.com/Shadscure/Beltborne-Lanterns/refs/heads/1.21-multiloader/demo/demo4.webp" alt="demo 4" width="380"></td>
   </tr>
   <tr>
-    <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo5.webp" alt="demo 5" width="380"></td>
-    <td><img src="https://raw.githubusercontent.com/0xCoDSnet/Beltborne-Lanterns/refs/heads/1.21-architectury-loom/demo/demo6.webp" alt="demo 6" width="380"></td>
+    <td><img src="https://raw.githubusercontent.com/Shadscure/Beltborne-Lanterns/refs/heads/1.21-multiloader/demo/demo5.webp" alt="demo 5" width="380"></td>
+    <td><img src="https://raw.githubusercontent.com/Shadscure/Beltborne-Lanterns/refs/heads/1.21-multiloader/demo/demo6.webp" alt="demo 6" width="380"></td>
   </tr>
 </table>
 
@@ -82,7 +81,7 @@ Need it back in your hands? Press **B** again. 💡
 * **Does this work with the [Accessories](https://modrinth.com/mod/accessories)?** — **YES**, Install the **[Beltborne Lanterns: Accessories Layer](https://modrinth.com/mod/beltborne-lanterns-accessories-layer)** add-on.
 * **Does this work with the [First-person Model](https://modrinth.com/mod/first-person-model)?** — **YES**, and it looks fantastic! *(screenshot under spoiler)*
   <details><summary>Show screenshot</summary>
-    <img width="854" height="480" alt="2025-09-02_22 58 42" src="https://github.com/user-attachments/assets/cdcde99f-b18e-4d9c-946e-888637c1ad8e" />
+    <img width="854" height="480" alt="2025-09-02_22 58 42" src="https://cdn.modrinth.com/data/cached_images/152920d7a3299d971640438bc0bbb7eaea029728.png" />
   </details>
 
 

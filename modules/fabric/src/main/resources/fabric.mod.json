@@ -34,15 +34,12 @@
       "net.oxcodsnet.beltborne_lanterns.common.LambDynLightsInitializer"
     ]
   },
-  "mixins": [
-    "beltborne_lanterns.fabric.mixins.json"
-  ],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
-    "minecraft": "~${minecraft_version}",
+    "minecraft": "${minecraft_version}",
     "java": ">=21",
     "fabric-api": "*",
-    "cloth-config2": ">=${cloth_config_version}"
+    "cloth-config2": ">=${cloth_floor}"
   },
   "suggests": {
     "modmenu": "${modmenu_version}"

@@ -13,6 +13,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -56,6 +57,7 @@ public final class BLNeoForgeClient {
         // Load the lamp registry from the client's config file on startup.
         // This makes the config screen work before joining a world.
         LampRegistry.init();
+        event.enqueueWork(BLClientConfigAccess::get);
         BLMod.LOGGER.info("Client initialization started [NeoForge]");
 
         // Provide platform bridges for common renderer
@@ -120,6 +122,19 @@ public final class BLNeoForgeClient {
     @EventBusSubscriber(modid = BLMod.MOD_ID, value = Dist.CLIENT)
     public static final class ClientBus {
         private ClientBus() {}
+
+        @SubscribeEvent
+        public static void onClientLogin(ClientPlayerNetworkEvent.LoggingIn event) {
+            ClientBeltPlayers.clear();
+            LanternSwingManager.clearAll();
+            LampRegistry.init();
+        }
+
+        @SubscribeEvent
+        public static void onClientLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+            ClientBeltPlayers.clear();
+            LanternSwingManager.clearAll();
+        }
 
         @SubscribeEvent
         public static void onEntityLeave(EntityLeaveLevelEvent event) {

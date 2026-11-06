@@ -4,6 +4,7 @@
   "key.beltborne_lanterns.open_debug": "Open Lantern Debug Editor",
   "key.beltborne_lanterns.toggle_debug": "Toggle Debug Gizmos",
   "key.beltborne_lanterns.toggle_lantern": "Toggle Belt Lantern",
+  "message.beltborne_lanterns.hold_lantern": "Hold a compatible lantern in your hand to equip it on your belt",
   "text.autoconfig.beltborne_lanterns.category.default": "General Settings",
   "text.autoconfig.beltborne_lanterns.category.lamps": "Custom Lamps",
   "text.autoconfig.beltborne_lanterns.option.ExtraLampEntry": "Lamp Entry",
