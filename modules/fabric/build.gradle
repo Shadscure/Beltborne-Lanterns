@@ -12,9 +12,11 @@ base {
 def modId = rootProject.findProperty('mod_id')
 
 repositories {
+    mavenLocal()
     maven { url = 'https://maven.shedaniel.me/' }
     maven { url = 'https://maven.terraformersmc.com/' }
     maven { url = 'https://maven.gegy.dev' }
+    maven { url = 'https://api.modrinth.com/maven' }
 }
 
 loom {
@@ -78,6 +80,10 @@ dependencies {
 
 processResources {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    def nf = rootProject.neoforge_version.tokenize('.')
+    def nfSeries = "${nf[0]}.${nf[1]}"
+    def nfNext   = "${nf[0]}.${(nf[1] as int) + 1}"
+    def clothFloor = "${rootProject.cloth_config_version.tokenize('.')[0]}.0.0"
     def props = [
         version: project.version,
         mod_id: rootProject.findProperty('mod_id'),
@@ -91,6 +97,9 @@ processResources {
         fabric_loader_version: rootProject.findProperty('fabric_loader_version'),
         cloth_config_version: rootProject.findProperty('cloth_config_version'),
         modmenu_version: rootProject.findProperty('modmenu_version'),
+        neoforge_range: "[${nfSeries},${nfNext})",
+        minecraft_range: "[${rootProject.minecraft_version}]",
+        cloth_floor: clothFloor,
     ]
     inputs.properties(props)
     filesMatching('fabric.mod.json') { expand(props) }

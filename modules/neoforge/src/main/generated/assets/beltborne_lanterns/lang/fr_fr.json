@@ -4,6 +4,7 @@
   "key.beltborne_lanterns.open_debug": "Ouvrir l'Éditeur de Débogage de Lanterne",
   "key.beltborne_lanterns.toggle_debug": "Activer/Désactiver les Gizmos de Débogage",
   "key.beltborne_lanterns.toggle_lantern": "Activer/Désactiver la Lanterne de Ceinture",
+  "message.beltborne_lanterns.hold_lantern": "Tenez une lanterne compatible en main pour l'équiper à la ceinture",
   "text.autoconfig.beltborne_lanterns.category.default": "Paramètres Généraux",
   "text.autoconfig.beltborne_lanterns.category.lamps": "Lampes Personnalisées",
   "text.autoconfig.beltborne_lanterns.option.ExtraLampEntry": "Entrée de Lampe",

@@ -53,7 +53,16 @@ public final class BLNeoForgeNetwork {
                 boolean hasLamp = BeltState.hasLamp(player);
                 if (!hasLamp && !LampRegistry.isLamp(stack)) {
                     stack = player.getOffhandItem();
-                    if (!LampRegistry.isLamp(stack)) return;
+                    if (!LampRegistry.isLamp(stack)) {
+                        BLMod.LOGGER.debug(
+                                "toggle request from {}: handItem={} lampOnBelt={}",
+                                player.getScoreboardName(),
+                                player.getMainHandItem().getItem(),
+                                hasLamp
+                        );
+                        player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.beltborne_lanterns.hold_lantern"), true);
+                        return;
+                    }
                 }
                 Item nowHas = BeltLanternServer.toggleLantern(player, stack);
                 BeltNetworking.broadcastBeltState(player, nowHas);

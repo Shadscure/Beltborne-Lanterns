@@ -67,6 +67,7 @@ public final class BLLanguage {
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry", "Lamp Entry");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.id", "Item ID");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.luminance", "Luminance");
+        add.accept("message.beltborne_lanterns.hold_lantern", "Hold a compatible lantern in your hand to equip it on your belt");
     }
 
     private static void fillRu(BiConsumer<String, String> add) {
@@ -100,6 +101,7 @@ public final class BLLanguage {
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry", "Запись о лампе");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.id", "ID Предмета");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.luminance", "Яркость");
+        add.accept("message.beltborne_lanterns.hold_lantern", "Возьмите подходящий фонарь в руку, чтобы повесить его на пояс");
     }
 
     private static void fillEs(BiConsumer<String, String> add) {
@@ -133,6 +135,7 @@ public final class BLLanguage {
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry", "Entrada de Lámpara");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.id", "ID del Objeto");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.luminance", "Luminancia");
+        add.accept("message.beltborne_lanterns.hold_lantern", "Sostén una linterna compatible en tu mano para equiparla en el cinturón");
     }
 
     private static void fillFr(BiConsumer<String, String> add) {
@@ -166,6 +169,7 @@ public final class BLLanguage {
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry", "Entrée de Lampe");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.id", "ID de l'objet");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.luminance", "Luminance");
+        add.accept("message.beltborne_lanterns.hold_lantern", "Tenez une lanterne compatible en main pour l'équiper à la ceinture");
     }
 
     private static void fillDe(BiConsumer<String, String> add) {
@@ -199,6 +203,7 @@ public final class BLLanguage {
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry", "Lampeneintrag");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.id", "Gegenstand-ID");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.luminance", "Leuchtkraft");
+        add.accept("message.beltborne_lanterns.hold_lantern", "Halte eine kompatible Laterne in der Hand, um sie am Gürtel zu befestigen");
     }
 
     private static void fillZh(BiConsumer<String, String> add) {
@@ -232,6 +237,7 @@ public final class BLLanguage {
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry", "灯笼条目");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.id", "物品 ID");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.luminance", "亮度");
+        add.accept("message.beltborne_lanterns.hold_lantern", "请手持兼容的灯笼以将其佩戴在腰带上");
     }
 
     private static void fillUk(BiConsumer<String, String> add) {
@@ -265,5 +271,6 @@ public final class BLLanguage {
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry", "Запис про лампу");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.id", "ID Предмета");
         add.accept("text.autoconfig.beltborne_lanterns.option.ExtraLampEntry.luminance", "Яскравість");
+        add.accept("message.beltborne_lanterns.hold_lantern", "Візьміть сумісний ліхтар у руку, щоб повісити його на пояс");
     }
 }
