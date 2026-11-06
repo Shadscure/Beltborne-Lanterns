@@ -28,7 +28,7 @@ import java.util.Set;
 public final class LampRegistry {
     private record LampData(BlockState state, int luminance) {}
 
-    private static final Map<Item, LampData> LAMPS = new LinkedHashMap<>();
+    private static volatile Map<Item, LampData> LAMPS = Map.of();
     public static final TagKey<Item> EXTRA_LAMPS_TAG = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(BLMod.MOD_ID, "lamps"));
 
     private LampRegistry() {}
@@ -40,13 +40,12 @@ public final class LampRegistry {
      * supported lamps without code changes.
      */
     public static void init() {
-        // Clear previous entries so tag reloads can rebuild the registry
-        LAMPS.clear();
+        Map<Item, LampData> next = new LinkedHashMap<>();
 
         // Built-in vanilla lamps
-        register(Items.LANTERN, Blocks.LANTERN.defaultBlockState().setValue(BlockStateProperties.HANGING, false));
-        register(Items.SOUL_LANTERN, Blocks.SOUL_LANTERN.defaultBlockState().setValue(BlockStateProperties.HANGING, false));
-        registerCopperLanterns();
+        put(next, Items.LANTERN, Blocks.LANTERN.defaultBlockState().setValue(BlockStateProperties.HANGING, false));
+        put(next, Items.SOUL_LANTERN, Blocks.SOUL_LANTERN.defaultBlockState().setValue(BlockStateProperties.HANGING, false));
+        registerCopperLanterns(next);
 
         // Dynamically register any additional tagged items (MC 1.21+: iterateEntries)
         try {
@@ -56,13 +55,13 @@ public final class LampRegistry {
                 ResourceLocation id = BuiltInRegistries.ITEM.getKey(entry.value());
                 BLMod.LOGGER.debug(" - {}", id);
                 Item item = entry.value();
-                if (LAMPS.containsKey(item)) continue;
+                if (next.containsKey(item)) continue;
                 if (item instanceof BlockItem blockItem) {
                     BlockState state = blockItem.getBlock().defaultBlockState();
                     if (state.hasProperty(BlockStateProperties.HANGING)) {
                         state = state.setValue(BlockStateProperties.HANGING, false);
                     }
-                    register(item, state);
+                    put(next, item, state);
                 }
             }
             if (discovered > 0) {
@@ -85,30 +84,32 @@ public final class LampRegistry {
             if (state.hasProperty(BlockStateProperties.HANGING)) {
                 state = state.setValue(BlockStateProperties.HANGING, false);
             }
-            register(item, state, entry.luminance);
+            put(next, item, state, entry.luminance);
         });
 
+        LAMPS = Collections.unmodifiableMap(next);
+
         // Final summary (info level): total, builtin vs extras
-        int total = LAMPS.size();
+        int total = next.size();
         int builtin = 0;
-        if (LAMPS.containsKey(Items.LANTERN)) builtin++;
-        if (LAMPS.containsKey(Items.SOUL_LANTERN)) builtin++;
+        if (next.containsKey(Items.LANTERN)) builtin++;
+        if (next.containsKey(Items.SOUL_LANTERN)) builtin++;
         int extras = Math.max(0, total - builtin);
         BLMod.LOGGER.info("Lamp registry ready: {} items ({} builtin, {} extra)", total, builtin, extras);
     }
 
-    private static void registerCopperLanterns() {
-        registerCopperVariant("copper_lantern");
-        registerCopperVariant("exposed_copper_lantern");
-        registerCopperVariant("weathered_copper_lantern");
-        registerCopperVariant("oxidized_copper_lantern");
-        registerCopperVariant("waxed_copper_lantern");
-        registerCopperVariant("waxed_exposed_copper_lantern");
-        registerCopperVariant("waxed_weathered_copper_lantern");
-        registerCopperVariant("waxed_oxidized_copper_lantern");
+    private static void registerCopperLanterns(Map<Item, LampData> target) {
+        registerCopperVariant(target, "copper_lantern");
+        registerCopperVariant(target, "exposed_copper_lantern");
+        registerCopperVariant(target, "weathered_copper_lantern");
+        registerCopperVariant(target, "oxidized_copper_lantern");
+        registerCopperVariant(target, "waxed_copper_lantern");
+        registerCopperVariant(target, "waxed_exposed_copper_lantern");
+        registerCopperVariant(target, "waxed_weathered_copper_lantern");
+        registerCopperVariant(target, "waxed_oxidized_copper_lantern");
     }
 
-    private static void registerCopperVariant(String path) {
+    private static void registerCopperVariant(Map<Item, LampData> target, String path) {
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath(ResourceLocation.DEFAULT_NAMESPACE, path);
         Item item = BuiltInRegistries.ITEM.getValue(id);
         if (!(item instanceof BlockItem blockItem)) {
@@ -119,19 +120,31 @@ public final class LampRegistry {
         if (state.hasProperty(BlockStateProperties.HANGING)) {
             state = state.setValue(BlockStateProperties.HANGING, false);
         }
-        register(item, state);
+        put(target, item, state);
     }
 
     private static int clampLuminance(int lum) {
         return Math.max(0, Math.min(15, lum));
     }
 
-    public static void register(Item item, BlockState state) {
-        LAMPS.put(item, new LampData(state, state.getLightEmission()));
+    private static void put(Map<Item, LampData> target, Item item, BlockState state) {
+        target.put(item, new LampData(state, state.getLightEmission()));
     }
 
-    public static void register(Item item, BlockState state, int luminance) {
-        LAMPS.put(item, new LampData(state, clampLuminance(luminance)));
+    private static void put(Map<Item, LampData> target, Item item, BlockState state, int luminance) {
+        target.put(item, new LampData(state, clampLuminance(luminance)));
+    }
+
+    public static synchronized void register(Item item, BlockState state) {
+        Map<Item, LampData> next = new LinkedHashMap<>(LAMPS);
+        put(next, item, state);
+        LAMPS = Collections.unmodifiableMap(next);
+    }
+
+    public static synchronized void register(Item item, BlockState state, int luminance) {
+        Map<Item, LampData> next = new LinkedHashMap<>(LAMPS);
+        put(next, item, state, luminance);
+        LAMPS = Collections.unmodifiableMap(next);
     }
 
     public static boolean isLamp(ItemStack stack) {
@@ -161,7 +174,7 @@ public final class LampRegistry {
     }
 
     public static Set<Item> items() {
-        return Collections.unmodifiableSet(LAMPS.keySet());
+        return LAMPS.keySet();
     }
 
 }
