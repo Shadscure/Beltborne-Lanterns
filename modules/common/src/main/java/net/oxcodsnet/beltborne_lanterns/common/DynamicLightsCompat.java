@@ -86,4 +86,15 @@ public final class DynamicLightsCompat {
             BLMod.LOGGER.debug("Failed to remove DynamicLights source for {}", player.getUUID(), t);
         }
     }
+
+    public static void clearAll() {
+        if (PRESENT && removeLightSource != null) {
+            for (Object proxy : ACTIVE.values()) {
+                try {
+                    removeLightSource.invoke(null, proxy);
+                } catch (Throwable ignored) {}
+            }
+        }
+        ACTIVE.clear();
+    }
 }

@@ -4,6 +4,7 @@
   "key.beltborne_lanterns.open_debug": "打开灯笼调试编辑器",
   "key.beltborne_lanterns.toggle_debug": "切换调试 Gizmos",
   "key.beltborne_lanterns.toggle_lantern": "切换腰带灯笼",
+  "message.beltborne_lanterns.hold_lantern": "请手持兼容的灯笼以将其佩戴在腰带上",
   "text.autoconfig.beltborne_lanterns.category.default": "常规设置",
   "text.autoconfig.beltborne_lanterns.category.lamps": "自定义灯笼",
   "text.autoconfig.beltborne_lanterns.option.ExtraLampEntry": "灯笼条目",
