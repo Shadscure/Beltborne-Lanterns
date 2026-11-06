@@ -12,6 +12,8 @@ import net.oxcodsnet.beltborne_lanterns.common.client.BLClientAbstractions;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfig;
 import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfigAccess;
 
+import java.util.Locale;
+
 /**
  * Simple in-game debug UI to tweak lantern FeatureRenderer transforms.
  * Loader-agnostic: relies only on Minecraft client + AutoConfig.
@@ -130,19 +132,19 @@ public class LanternDebugScreen extends Screen {
     }
 
     private String stepText() {
-        return String.format("%.3f", STEP_PRESETS[stepIndex]);
+        return String.format(Locale.ROOT, "%.3f", STEP_PRESETS[stepIndex]);
     }
 
     private void refreshCopyPreview() {
         BLClientConfig c = BLClientConfigAccess.get();
-        String s = String.format("off(%.3f,%.3f,%.3f) piv(%.3f,%.3f,%.3f) rot(%d,%d,%d) sc(%.3f)",
+        String s = String.format(Locale.ROOT, "off(%.3f,%.3f,%.3f) piv(%.3f,%.3f,%.3f) rot(%d,%d,%d) sc(%.3f)",
                 c.fOffsetX(), c.fOffsetY(), c.fOffsetZ(), c.fPivotX(), c.fPivotY(), c.fPivotZ(), c.rotXDeg, c.rotYDeg, c.rotZDeg, c.fScale());
         if (copyPreviewField != null) copyPreviewField.setValue(s);
     }
 
     private void copyValuesToClipboard() {
         BLClientConfig c = BLClientConfigAccess.get();
-        String jsonish = String.format("{offset:[%.3f,%.3f,%.3f], pivot:[%.3f,%.3f,%.3f], rot:[%d,%d,%d], scale:%.3f}",
+        String jsonish = String.format(Locale.ROOT, "{offset:[%.3f,%.3f,%.3f], pivot:[%.3f,%.3f,%.3f], rot:[%d,%d,%d], scale:%.3f}",
                 c.fOffsetX(), c.fOffsetY(), c.fOffsetZ(), c.fPivotX(), c.fPivotY(), c.fPivotZ(), c.rotXDeg, c.rotYDeg, c.rotZDeg, c.fScale());
         Minecraft.getInstance().keyboardHandler.setClipboard(jsonish);
     }
@@ -201,13 +203,13 @@ public class LanternDebugScreen extends Screen {
         int y = 10;
         ctx.drawString(this.font, Component.literal("Lantern Debug (hold Shift=×10, Ctrl=×0.1)" ).withStyle(ChatFormatting.YELLOW), x, y, 0xFFFFFF, false);
         y += 14;
-        ctx.drawString(this.font, Component.literal(String.format("Offset: X=%.3f Y=%.3f Z=%.3f", c.fOffsetX(), c.fOffsetY(), c.fOffsetZ())), x, y, 0xFFFFFF, false);
+        ctx.drawString(this.font, Component.literal(String.format(Locale.ROOT, "Offset: X=%.3f Y=%.3f Z=%.3f", c.fOffsetX(), c.fOffsetY(), c.fOffsetZ())), x, y, 0xFFFFFF, false);
         y += 12;
-        ctx.drawString(this.font, Component.literal(String.format("Pivot:  X=%.3f Y=%.3f Z=%.3f", c.fPivotX(), c.fPivotY(), c.fPivotZ())), x, y, 0xFFFFFF, false);
+        ctx.drawString(this.font, Component.literal(String.format(Locale.ROOT, "Pivot:  X=%.3f Y=%.3f Z=%.3f", c.fPivotX(), c.fPivotY(), c.fPivotZ())), x, y, 0xFFFFFF, false);
         y += 12;
         ctx.drawString(this.font, Component.literal(String.format("Rot:    X=%d Y=%d Z=%d", c.rotXDeg, c.rotYDeg, c.rotZDeg)), x, y, 0xFFFFFF, false);
         y += 12;
-        ctx.drawString(this.font, Component.literal(String.format("Scale:  %.3f", c.fScale())), x, y, 0xFFFFFF, false);
+        ctx.drawString(this.font, Component.literal(String.format(Locale.ROOT, "Scale:  %.3f", c.fScale())), x, y, 0xFFFFFF, false);
     }
 
     @Override

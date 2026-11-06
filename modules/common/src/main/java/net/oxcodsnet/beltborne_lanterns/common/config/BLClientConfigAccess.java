@@ -4,6 +4,7 @@ import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.minecraft.world.InteractionResult;
+import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
 
 /**
@@ -15,6 +16,16 @@ public final class BLClientConfigAccess {
 
     private BLClientConfigAccess() {}
 
+    private static boolean looksLikeOldScale(BLClientConfig clientConfig) {
+        return Math.abs(clientConfig.offsetX100) <= 200 &&
+                Math.abs(clientConfig.offsetY100) <= 200 &&
+                Math.abs(clientConfig.offsetZ100) <= 200 &&
+                Math.abs(clientConfig.pivotX100)  <= 200 &&
+                Math.abs(clientConfig.pivotY100)  <= 200 &&
+                Math.abs(clientConfig.pivotZ100)  <= 200 &&
+                clientConfig.scale100 <= 100;
+    }
+
     private static void ensureInit() {
         if (HOLDER != null) return;
         synchronized (BLClientConfigAccess.class) {
@@ -23,23 +34,18 @@ public final class BLClientConfigAccess {
             HOLDER = AutoConfig.getConfigHolder(BLClientConfig.class);
             BLClientConfig clientConfig = HOLDER.getConfig();
 
-            // Migrate from 1/100 to 1/1000 precision if old values are detected
-            boolean looksLikeOldScale =
-                    Math.abs(clientConfig.offsetX100) <= 200 &&
-                    Math.abs(clientConfig.offsetY100) <= 200 &&
-                    Math.abs(clientConfig.offsetZ100) <= 200 &&
-                    Math.abs(clientConfig.pivotX100)  <= 200 &&
-                    Math.abs(clientConfig.pivotY100)  <= 200 &&
-                    Math.abs(clientConfig.pivotZ100)  <= 200 &&
-                    clientConfig.scale100 <= 100;
-            if (looksLikeOldScale) {
-                clientConfig.offsetX100 *= 10;
-                clientConfig.offsetY100 *= 10;
-                clientConfig.offsetZ100 *= 10;
-                clientConfig.pivotX100  *= 10;
-                clientConfig.pivotY100  *= 10;
-                clientConfig.pivotZ100  *= 10;
-                clientConfig.scale100   *= 10;
+            // Migrate from 1/100 to 1/1000 precision once if old values are detected
+            if (clientConfig.configVersion < BLClientConfig.CURRENT_CONFIG_VERSION) {
+                if (clientConfig.configVersion == 0 && looksLikeOldScale(clientConfig)) {
+                    clientConfig.offsetX100 *= 10;
+                    clientConfig.offsetY100 *= 10;
+                    clientConfig.offsetZ100 *= 10;
+                    clientConfig.pivotX100  *= 10;
+                    clientConfig.pivotY100  *= 10;
+                    clientConfig.pivotZ100  *= 10;
+                    clientConfig.scale100   *= 10;
+                }
+                clientConfig.configVersion = BLClientConfig.CURRENT_CONFIG_VERSION;
                 HOLDER.save();
             }
             clientConfig.extraLampLight.clear(); // Clear existing to avoid duplicates on re-init
@@ -66,6 +72,13 @@ public final class BLClientConfigAccess {
                 LampRegistry.init();
                 return InteractionResult.SUCCESS;
             });
+            BLMod.LOGGER.info(
+                    "Client config loaded [startup]: offset=({},{},{}) scale={}",
+                    clientConfig.offsetX100,
+                    clientConfig.offsetY100,
+                    clientConfig.offsetZ100,
+                    clientConfig.scale100
+            );
         }
     }
 

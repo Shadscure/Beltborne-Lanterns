@@ -81,5 +81,9 @@ public final class BeltState {
     public static void setLamp(Player player, Item lamp) {
         setLamp(player.getUUID(), lamp);
     }
+
+    public static void clearAll() {
+        PLAYER_LAMPS.clear();
+    }
 }
 
