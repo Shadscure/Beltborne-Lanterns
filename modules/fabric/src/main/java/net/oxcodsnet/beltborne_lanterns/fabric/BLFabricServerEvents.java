@@ -42,7 +42,16 @@ public final class BLFabricServerEvents {
                 boolean hasLamp = BeltState.hasLamp(player);
                 if (!hasLamp && !LampRegistry.isLamp(stack)) {
                     stack = player.getOffhandItem();
-                    if (!LampRegistry.isLamp(stack)) return;
+                    if (!LampRegistry.isLamp(stack)) {
+                        net.oxcodsnet.beltborne_lanterns.BLMod.LOGGER.debug(
+                                "toggle request from {}: handItem={} lampOnBelt={}",
+                                player.getScoreboardName(),
+                                player.getMainHandItem().getItem(),
+                                hasLamp
+                        );
+                        player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.beltborne_lanterns.hold_lantern"), true);
+                        return;
+                    }
                 }
                 Item nowHas = BeltLanternServer.toggleLantern(player, stack);
                 BeltNetworking.broadcastBeltState(player, nowHas);
@@ -97,6 +106,7 @@ public final class BLFabricServerEvents {
             ServerPlayer leaving = handler.getPlayer();
             // Persist full stack with NBT on disconnect
             BeltLanternSave.get(server).set(leaving.getUUID(), BeltState.getLampStack(leaving));
+            BeltState.setLamp(leaving, (ItemStack) null);
         });
 
         // Handle lamp drop/persistence on death and sync after respawn
@@ -120,6 +130,7 @@ public final class BLFabricServerEvents {
             if (dpChanged) {
                 // Attempt a one-time /reload to apply the new datapack
                 try {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "datapack enable \"file/beltborne_lanterns_generated\"");
                     server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "reload");
                 } catch (Throwable t) {
                     net.oxcodsnet.beltborne_lanterns.BLMod.LOGGER.info("Runtime datapack updated — please run /reload to apply");
@@ -131,6 +142,9 @@ public final class BLFabricServerEvents {
             // Keep runtime datapack in sync on reload
             net.oxcodsnet.beltborne_lanterns.common.datapack.BLRuntimeDataPack.writeOrUpdate(server);
             // Accessories acceptance is handled via tags (runtime datapack)
+        });
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            BeltState.clearAll();
         });
     }
 }

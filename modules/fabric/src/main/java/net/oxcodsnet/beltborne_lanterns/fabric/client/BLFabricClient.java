@@ -43,6 +43,7 @@ public final class BLFabricClient implements ClientModInitializer {
         // Load the lamp registry from the client's config file on startup.
         // This makes the config screen work before joining a world.
         LampRegistry.init();
+        BLClientConfigAccess.get(); // loads JSON + seeds BLConfigs (#22)
         BLMod.LOGGER.info("Client initialization started [Fabric]");
 
         // Rebuild registry after client joins a server (tags/registries are synced at this point)
