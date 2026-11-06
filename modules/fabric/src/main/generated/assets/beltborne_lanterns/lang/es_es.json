@@ -4,6 +4,7 @@
   "key.beltborne_lanterns.open_debug": "Abrir Editor de Depuración de Linterna",
   "key.beltborne_lanterns.toggle_debug": "Alternar Gizmos de Depuración",
   "key.beltborne_lanterns.toggle_lantern": "Alternar Linterna de Cinturón",
+  "message.beltborne_lanterns.hold_lantern": "Sostén una linterna compatible en tu mano para equiparla en el cinturón",
   "text.autoconfig.beltborne_lanterns.category.default": "Configuraciones Generales",
   "text.autoconfig.beltborne_lanterns.category.lamps": "Lámparas Personalizadas",
   "text.autoconfig.beltborne_lanterns.option.ExtraLampEntry": "Entrada de Lámpara",

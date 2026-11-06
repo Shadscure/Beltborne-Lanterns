@@ -15,6 +15,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
@@ -48,6 +49,7 @@ public final class BLNeoForgeServerEvents {
         boolean dpChanged = net.oxcodsnet.beltborne_lanterns.common.datapack.BLRuntimeDataPack.writeOrUpdate(server);
         if (dpChanged) {
             try {
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "datapack enable \"file/beltborne_lanterns_generated\"");
                 server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "reload");
             } catch (Throwable t) {
                 net.oxcodsnet.beltborne_lanterns.BLMod.LOGGER.info("Runtime datapack updated — please run /reload to apply");
@@ -100,8 +102,15 @@ public final class BLNeoForgeServerEvents {
         if (!(event.getEntity() instanceof ServerPlayer leaving)) return;
         // Persist full stack with NBT on disconnect
         BeltLanternSave.get(server(leaving)).set(leaving.getUUID(), BeltState.getLampStack(leaving));
+        BeltState.setLamp(leaving, (ItemStack) null);
         // Clean up dynamic light source when leaving
         DynamicLightsCompat.removeFor(leaving);
+    }
+
+    @SubscribeEvent
+    public static void onServerStopped(ServerStoppedEvent event) {
+        BeltState.clearAll();
+        DynamicLightsCompat.clearAll();
     }
 
     @SubscribeEvent
