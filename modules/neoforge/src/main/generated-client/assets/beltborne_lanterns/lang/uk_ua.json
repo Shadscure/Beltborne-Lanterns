@@ -4,6 +4,7 @@
   "key.beltborne_lanterns.open_debug": "Відкрити редактор відлагодження ліхтаря",
   "key.beltborne_lanterns.toggle_debug": "Перемкнути відлагоджувальні гизмо",
   "key.beltborne_lanterns.toggle_lantern": "Перемкнути поясний ліхтар",
+  "message.beltborne_lanterns.hold_lantern": "Візьміть сумісний ліхтар у руку, щоб повісити його на пояс",
   "text.autoconfig.beltborne_lanterns.category.default": "Загальні налаштування",
   "text.autoconfig.beltborne_lanterns.category.lamps": "Користувацькі лампи",
   "text.autoconfig.beltborne_lanterns.option.ExtraLampEntry": "Запис про лампу",

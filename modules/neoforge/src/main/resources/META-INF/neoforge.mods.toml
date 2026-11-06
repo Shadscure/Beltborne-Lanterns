@@ -16,21 +16,21 @@ logoFile = "assets/beltborne_lanterns/icon.png"
 [[dependencies.beltborne_lanterns]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.1,)"
+versionRange = "${neoforge_range}"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.beltborne_lanterns]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21,)"
+versionRange = "${minecraft_range}"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.beltborne_lanterns]]
 modId = "cloth_config"
 type = "required"
-versionRange = "[${cloth_config_version},)"
+versionRange = "[${cloth_floor},)"
 ordering = "NONE"
 side = "BOTH"
 
