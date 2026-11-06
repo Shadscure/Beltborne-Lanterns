@@ -4,6 +4,7 @@
   "key.beltborne_lanterns.open_debug": "Laternen-Debug-Editor öffnen",
   "key.beltborne_lanterns.toggle_debug": "Debug-Gizmos umschalten",
   "key.beltborne_lanterns.toggle_lantern": "Gürtellaterne umschalten",
+  "message.beltborne_lanterns.hold_lantern": "Halte eine kompatible Laterne in der Hand, um sie am Gürtel zu befestigen",
   "text.autoconfig.beltborne_lanterns.category.default": "Allgemeine Einstellungen",
   "text.autoconfig.beltborne_lanterns.category.lamps": "Benutzerdefinierte Lampen",
   "text.autoconfig.beltborne_lanterns.option.ExtraLampEntry": "Lampeneintrag",

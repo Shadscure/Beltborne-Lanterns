@@ -92,13 +92,12 @@ public class LanternBeltFeatureRenderer extends RenderLayer<PlayerRenderState, P
         } catch (Throwable ignored) {
         }
 
-        if (subject == null && Minecraft.getInstance().player != null) {
-            // Fallback: use local player if state field mapping changes
-            subject = Minecraft.getInstance().player.getUUID();
+        if (subject == null) {
             if (!UUID_LOOKUP_WARNED) {
-                net.oxcodsnet.beltborne_lanterns.BLMod.LOGGER.warn("Beltborne Lanterns: falling back to local player UUID in feature renderer; mixin may be needed for this mapping.");
+                net.oxcodsnet.beltborne_lanterns.BLMod.LOGGER.warn("Beltborne Lanterns: unresolved render subject; skipping lantern layer (PlayerRenderState UUID mixin not applied?)");
                 UUID_LOOKUP_WARNED = true;
             }
+            return;
         }
 
         if (subject == null) return;
