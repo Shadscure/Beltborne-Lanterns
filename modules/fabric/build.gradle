@@ -1,0 +1,162 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.fabricmc.fabric-loom'
+    id 'com.modrinth.minotaur'
+    id 'net.darkhax.curseforgegradle'
+}
+
+base {
+    archivesName = "${rootProject.archives_name}-fabric"
+}
+
+def modId = rootProject.findProperty('mod_id')
+
+repositories {
+    mavenLocal()
+    maven { url = 'https://maven.shedaniel.me/' }
+    maven { url = 'https://maven.terraformersmc.com/' }
+    maven { url = 'https://maven.gegy.dev' }
+    maven { url = 'https://api.modrinth.com/maven' }
+}
+
+loom {
+    mixin {
+        defaultRefmapName = "beltborne_lanterns-fabric.refmap.json"
+    }
+
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Client")
+            ideConfigGenerated(true)
+            runDir("run/client")
+        }
+        server {
+            server()
+            setConfigName("Fabric Server")
+            ideConfigGenerated(true)
+            runDir("run/server")
+        }
+    }
+}
+
+fabricApi {
+    configureDataGeneration()
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += file("src/main/generated")
+        }
+    }
+}
+
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+dependencies {
+    minecraft "net.minecraft:minecraft:${rootProject.minecraft_version}"
+
+    implementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+
+    // Cloth Config
+    implementation "me.shedaniel.cloth:cloth-config-fabric:${rootProject.cloth_config_version}"
+
+    // Mod Menu (optional)
+    compileOnly "com.terraformersmc:modmenu:${rootProject.modmenu_version}"
+    runtimeOnly "com.terraformersmc:modmenu:${rootProject.modmenu_version}"
+
+    // LambDynamicLights API (compile-only for common code)
+    compileOnly "dev.lambdaurora.lambdynamiclights:lambdynamiclights-api:${rootProject.lambdynamiclights_version}"
+
+    // LambDynamicLights (runtime only for testing)
+    runtimeOnly "dev.lambdaurora.lambdynamiclights:lambdynamiclights-runtime:${rootProject.lambdynamiclights_version}"
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    def nf = rootProject.neoforge_version.tokenize('.')
+    def nfSeries = "${nf[0]}.${nf[1]}"
+    def nfNext   = "${nf[0]}.${(nf[1] as int) + 1}"
+    def clothFloor = "${rootProject.cloth_config_version.tokenize('.')[0]}.0.0"
+    def props = [
+        version: project.version,
+        mod_id: rootProject.findProperty('mod_id'),
+        mod_name: rootProject.findProperty('mod_name'),
+        mod_description: rootProject.findProperty('mod_description'),
+        mod_authors: rootProject.findProperty('mod_authors'),
+        mod_homepage: rootProject.findProperty('mod_homepage'),
+        mod_sources: rootProject.findProperty('mod_sources'),
+        mod_license: rootProject.findProperty('mod_license'),
+        minecraft_version: rootProject.findProperty('minecraft_version'),
+        fabric_loader_version: rootProject.findProperty('fabric_loader_version'),
+        cloth_config_version: rootProject.findProperty('cloth_config_version'),
+        modmenu_version: rootProject.findProperty('modmenu_version'),
+        neoforge_range: "[${nfSeries},${nfNext})",
+        minecraft_range: "[${rootProject.minecraft_version}]",
+        cloth_floor: clothFloor,
+    ]
+    inputs.properties(props)
+    filesMatching('fabric.mod.json') { expand(props) }
+}
+
+jar {
+    archiveFileName.set("${rootProject.archives_name}-${project.version}-fabric+${rootProject.minecraft_version}.jar")
+}
+
+// =========== Modrinth =========
+def modrinth_token = rootProject.ext.resolveModrinthToken()
+if (!modrinth_token) {
+    logger.warn("WARNING: MODRINTH_TOKEN not found. Publishing to Modrinth will be skipped.")
+    modrinth_token = "dummy_token_publishing_disabled"
+}
+
+modrinth {
+    token = modrinth_token
+    projectId = "NUFDZAKS"
+    versionNumber = "${project.version}-fabric"
+    versionName   = "Beltborne Lanterns v${project.version}+${rootProject.minecraft_version} [Fabric/Quilt]"
+    versionType   = "release"                 // или "beta"/"alpha"
+    gameVersions  = [ rootProject.minecraft_version ]
+    loaders       = [ "fabric","quilt" ]
+    uploadFile    = jar
+    changelog     = rootProject.file("CHANGELOG.md").exists() ? rootProject.file("CHANGELOG.md").text : ""
+    dependencies { required.project "cloth-config" }
+}
+
+// ====================== CurseForge ====================
+def curse_token = rootProject.ext.resolveCurseforgeToken()
+if (!curse_token) {
+    logger.warn("WARNING: CURSEFORGE_TOKEN not found. Publishing to CurseForge will be skipped.")
+    curse_token = "dummy_token_publishing_disabled"
+}
+
+
+def curse_project_id =
+        (findProperty("curseforge_project_fabric")
+                ?: System.getenv("CURSEFORGE_PROJECT_FABRIC")
+                ?: findProperty("curseforge_project")
+                ?: System.getenv("CURSEFORGE_PROJECT_ID")
+                ?: "1337474")
+
+tasks.register("curseforge", net.darkhax.curseforgegradle.TaskPublishCurseForge) {
+    apiToken = curse_token
+
+    disableVersionDetection()
+
+    dependsOn jar
+    def mainFile = upload(curse_project_id as String, jar)
+
+    mainFile.displayName = "Beltborne Lanterns v${project.version}+${rootProject.minecraft_version} [Fabric/Quilt]"
+    mainFile.releaseType = "release"
+    mainFile.addModLoader("Fabric")
+    mainFile.addModLoader("Quilt")
+    mainFile.addGameVersion("${rootProject.minecraft_version}")
+    mainFile.addJavaVersion("Java 25")
+    mainFile.addEnvironment("Client", "Server")
+    mainFile.changelog = rootProject.file("CHANGELOG.md"); mainFile.changelogType = "markdown"
+    mainFile.addRequirement("cloth-config")
+}
