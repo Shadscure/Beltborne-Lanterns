@@ -12,11 +12,13 @@ public final class LanternClientLogic {
     private LanternClientLogic() {}
 
     public static void tickLanternPhysics(Minecraft mc) {
-        if (mc.level == null) return;
+        if (mc.isPaused() || mc.level == null) return;
         final float dt = 1.0f / 20.0f;
         for (Player p : mc.level.players()) {
             if (BLClientAbstractions.clientHasLantern(p)) {
                 LanternSwingManager.tickPlayer(p, dt, BLConfigs.get().rotXDeg);
+            } else {
+                LanternSwingManager.removePlayer(p.getUUID());
             }
         }
     }

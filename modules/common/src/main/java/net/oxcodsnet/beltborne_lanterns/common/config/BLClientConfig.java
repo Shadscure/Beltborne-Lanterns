@@ -7,7 +7,6 @@ import net.oxcodsnet.beltborne_lanterns.BLMod;
 
 @Config(name = BLMod.MOD_ID)
 public class BLClientConfig implements ConfigData {
-    public static final int CURRENT_CONFIG_VERSION = 2;
 
     @ConfigEntry.Gui.Excluded
     public int configVersion = 0;
