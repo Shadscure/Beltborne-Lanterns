@@ -18,8 +18,8 @@ public final class BLLampConfigAccess {
         synchronized (BLLampConfigAccess.class) {
             if (HOLDER != null) return;
             AutoConfig.register(BLLampConfig.class, GsonConfigSerializer::new);
-            HOLDER = AutoConfig.getConfigHolder(BLLampConfig.class);
-            BLLampConfig lampConfig = HOLDER.getConfig();
+            ConfigHolder<BLLampConfig> holder = AutoConfig.getConfigHolder(BLLampConfig.class);
+            BLLampConfig lampConfig = holder.getConfig();
 
             java.util.Map<String, BLClientConfig.ExtraLampEntry> combinedLamps = new java.util.LinkedHashMap<>();
 
@@ -32,12 +32,14 @@ public final class BLLampConfigAccess {
 
             // Add/overwrite custom entries from the config file
             lampConfig.extraLampLight.forEach(entry -> {
+                if (entry == null || entry.id == null) return;
                 combinedLamps.put(entry.id, new BLClientConfig.ExtraLampEntry(entry.id, entry.luminance));
             });
 
             // Clear the original list and add all combined lamps
             lampConfig.extraLampLight.clear();
             lampConfig.extraLampLight.addAll(combinedLamps.values());
+            HOLDER = holder;
         }
     }
 
