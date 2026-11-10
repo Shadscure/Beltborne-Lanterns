@@ -1,0 +1,161 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version '1.15.5' apply false
+    id 'net.neoforged.moddev' version '2.0.140' apply false
+    id 'com.modrinth.minotaur' version '2.8.8' apply false
+    id 'net.darkhax.curseforgegradle' version '1.1.26' apply false
+    id 'co.uzzu.dotenv.gradle' version '4.0.0'
+}
+
+allprojects {
+    group = rootProject.maven_group
+    version = rootProject.mod_version
+}
+
+// ====================== Maven (.env) ====================
+// ---- helpers for Maven repository configuration ----
+ext.resolveMavenRepoUrl = {
+    def v = System.getenv("MAVEN_REPO_URL") ?: System.getenv("MAVEN_URL")
+    if (!v) {
+        def e = rootProject.extensions.findByName("env")
+        if (e != null) {
+            if (e.isPresent("MAVEN_REPO_URL")) v = e.fetch("MAVEN_REPO_URL")
+            else if (e.isPresent("MAVEN_URL"))  v = e.fetch("MAVEN_URL")
+            else if (e.isPresent("maven_repo_url")) v = e.fetch("maven_repo_url")
+            else if (e.isPresent("maven_url"))      v = e.fetch("maven_url")
+        }
+    }
+    if (!v && rootProject.hasProperty("MAVEN_REPO_URL")) v = rootProject.property("MAVEN_REPO_URL")?.toString()
+    if (!v && rootProject.hasProperty("MAVEN_URL"))      v = rootProject.property("MAVEN_URL")?.toString()
+    return v
+}
+
+ext.resolveMavenRepoUsername = {
+    def v = System.getenv("MAVEN_REPO_USERNAME") ?: System.getenv("MAVEN_REPO_USER") ?: System.getenv("MAVEN_USERNAME") ?: System.getenv("MAVEN_USER")
+    if (!v) {
+        def e = rootProject.extensions.findByName("env")
+        if (e != null) {
+            ["MAVEN_REPO_USERNAME","MAVEN_REPO_USER","MAVEN_USERNAME","MAVEN_USER","maven_repo_username","maven_repo_user","maven_username","maven_user"].find {
+                if (e.isPresent(it)) { v = e.fetch(it); return true }
+                return false
+            }
+        }
+    }
+    if (!v) {
+        ["MAVEN_REPO_USERNAME","MAVEN_REPO_USER","MAVEN_USERNAME","MAVEN_USER"].find {
+            if (rootProject.hasProperty(it)) { v = rootProject.property(it)?.toString(); return true }
+            return false
+        }
+    }
+    return v
+}
+
+ext.resolveMavenRepoPassword = {
+    def v = System.getenv("MAVEN_REPO_PASSWORD") ?: System.getenv("MAVEN_PASSWORD")
+    if (!v) {
+        def e = rootProject.extensions.findByName("env")
+        if (e != null) {
+            ["MAVEN_REPO_PASSWORD","MAVEN_PASSWORD","maven_repo_password","maven_password"].find {
+                if (e.isPresent(it)) { v = e.fetch(it); return true }
+                return false
+            }
+        }
+    }
+    if (!v) {
+        ["MAVEN_REPO_PASSWORD","MAVEN_PASSWORD"].find {
+            if (rootProject.hasProperty(it)) { v = rootProject.property(it)?.toString(); return true }
+            return false
+        }
+    }
+    return v
+}
+
+ext.resolveMavenRepoToken = {
+    def v = System.getenv("MAVEN_REPO_TOKEN") ?: System.getenv("MAVEN_TOKEN")
+    if (!v) {
+        def e = rootProject.extensions.findByName("env")
+        if (e != null) {
+            ["MAVEN_REPO_TOKEN","MAVEN_TOKEN","maven_repo_token","maven_token"].find {
+                if (e.isPresent(it)) { v = e.fetch(it); return true }
+                return false
+            }
+        }
+    }
+    if (!v) {
+        ["MAVEN_REPO_TOKEN","MAVEN_TOKEN"].find {
+            if (rootProject.hasProperty(it)) { v = rootProject.property(it)?.toString(); return true }
+            return false
+        }
+    }
+    return v
+}
+
+ext.resolveMavenRepoName = {
+    def v = System.getenv("MAVEN_REPO_NAME")
+    if (!v) {
+        def e = rootProject.extensions.findByName("env")
+        if (e != null) {
+            if (e.isPresent("MAVEN_REPO_NAME")) v = e.fetch("MAVEN_REPO_NAME")
+            else if (e.isPresent("maven_repo_name")) v = e.fetch("maven_repo_name")
+        }
+    }
+    if (!v && rootProject.hasProperty("MAVEN_REPO_NAME")) v = rootProject.property("MAVEN_REPO_NAME")?.toString()
+    return v ?: "private"
+}
+
+// ====================== CurseForge ====================
+ext.resolveCurseforgeToken = {
+    def t = System.getenv("CURSEFORGE_TOKEN")
+    if (!t) {
+        def e = rootProject.extensions.findByName("env")
+        if (e != null) {
+            if (e.isPresent("CURSEFORGE_TOKEN")) t = e.fetch("CURSEFORGE_TOKEN")
+            else if (e.isPresent("curseforge_token")) t = e.fetch("curseforge_token")
+        }
+    }
+    if (!t && rootProject.hasProperty("CURSEFORGE_TOKEN")) {
+        t = rootProject.property("CURSEFORGE_TOKEN")?.toString()
+    }
+    return t
+}
+
+tasks.register("publishCurseForgeAll") {
+    ["fabric", "neoforge", "quilt"].each { plat ->
+        if (findProject(":modules:${plat}") != null) {
+            dependsOn(":modules:${plat}:curseforge")
+        }
+    }
+}
+// ====================================================
+
+// ====================== Modrinth ====================
+ext.resolveModrinthToken = {
+    def t = System.getenv("MODRINTH_TOKEN")
+    if (!t) {
+        def e = rootProject.extensions.findByName("env")
+        if (e != null) {
+            if (e.isPresent("MODRINTH_TOKEN"))      t = e.fetch("MODRINTH_TOKEN")
+            else if (e.isPresent("modrinth_token")) t = e.fetch("modrinth_token")
+        }
+    }
+    if (!t && rootProject.hasProperty("MODRINTH_TOKEN")) {
+        t = rootProject.property("MODRINTH_TOKEN")?.toString()
+    }
+    return t
+}
+
+tasks.register("publishModrinthAll") {
+    ["fabric", "neoforge", "quilt"].each { plat ->
+        if (findProject(":modules:${plat}") != null) {
+            dependsOn(":modules:${plat}:modrinth")
+        }
+    }
+}
+
+// Aggregate task to publish all platform modules to Maven
+tasks.register("publishMavenAll") {
+    ["common", "fabric", "neoforge", "quilt"].each { plat ->
+        if (findProject(":modules:${plat}") != null) {
+            dependsOn(":modules:${plat}:publish")
+        }
+    }
+}

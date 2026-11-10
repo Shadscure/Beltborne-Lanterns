@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": ["${mod_authors}"],
+  "license": "${mod_license}",
+  "contact": {
+    "sources": "${mod_sources}",
+    "homepage": "${mod_homepage}"
+  },
+  "icon": "assets/beltborne_lanterns/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.oxcodsnet.beltborne_lanterns.fabric.BLFabric"
+    ],
+    "fabric-datagen": [
+      "net.oxcodsnet.beltborne_lanterns.fabric.datagen.BLDataGenerator"
+    ],
+    "client": [
+      "net.oxcodsnet.beltborne_lanterns.fabric.client.BLFabricClient"
+    ],
+    "modmenu": [
+      "net.oxcodsnet.beltborne_lanterns.fabric.client.BLFabricModMenu"
+    ],
+    "lambdynlights:initializer": [
+      "net.oxcodsnet.beltborne_lanterns.common.LambDynLightsInitializer"
+    ],
+    "dynamiclights": [
+      "net.oxcodsnet.beltborne_lanterns.common.LambDynLightsInitializer"
+    ]
+  },
+  "mixins": [
+    "beltborne_lanterns.fabric.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "minecraft": "${minecraft_version}",
+    "java": ">=25",
+    "fabric-api": "*",
+    "cloth-config2": ">=${cloth_floor}"
+  },
+  "suggests": {
+    "modmenu": "${modmenu_version}"
+  }
+}
