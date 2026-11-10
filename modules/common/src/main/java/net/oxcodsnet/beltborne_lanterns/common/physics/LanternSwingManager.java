@@ -41,6 +41,7 @@ public final class LanternSwingManager {
     private static final float SNEAK_BLEND_TAU_SEC = 0.15f;
 
     // Per-player state
+    private static final LanternSwingState EMPTY_STATE = new LanternSwingState(DEFAULT_OMEGA, DEFAULT_ZETA);
     private static final Map<UUID, LanternSwingState> STATES = new ConcurrentHashMap<>();
     private static final Map<UUID, Kinematics> KIN = new ConcurrentHashMap<>();
 
@@ -58,6 +59,10 @@ public final class LanternSwingManager {
 
         // Measure
         float yaw = wrapDegrees(p.getYRot());
+        if (!kin.initialized) {
+            kin.prevYaw = yaw;
+            kin.initialized = true;
+        }
         float yawRateDegPerSec = wrapDegrees(yaw - kin.prevYaw) / Math.max(dtSec, 1e-4f);
         float yawRateRadPerSec = (float) Math.toRadians(yawRateDegPerSec);
 
@@ -145,11 +150,11 @@ public final class LanternSwingManager {
     }
 
     public static float getXDeg(UUID id) {
-        return STATES.getOrDefault(id, new LanternSwingState(DEFAULT_OMEGA, DEFAULT_ZETA)).getXDeg();
+        return STATES.getOrDefault(id, EMPTY_STATE).getXDeg();
     }
 
     public static float getZDeg(UUID id) {
-        return STATES.getOrDefault(id, new LanternSwingState(DEFAULT_OMEGA, DEFAULT_ZETA)).getZDeg();
+        return STATES.getOrDefault(id, EMPTY_STATE).getZDeg();
     }
 
     public static float getBaseXDeg(UUID id) {
@@ -180,6 +185,7 @@ public final class LanternSwingManager {
     }
 
     private static final class Kinematics {
+        boolean initialized = false;
         float prevYaw = 0f;              // deg
         double prevHSpeedPerSec = 0.0;   // blocks/s
         double prevYVel = 0.0;           // blocks/tick
