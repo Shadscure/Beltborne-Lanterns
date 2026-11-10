@@ -50,46 +50,46 @@ public class LanternDebugScreen extends Screen {
         BLClientConfig cfg = BLClientConfigAccess.get();
 
         // Section: Offset
-        addRenderableWidget(Button.builder(Component.literal("Offset X-"), b -> { cfg.offsetX100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("X+"), b -> { cfg.offsetX100 += scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Offset X-"), b -> { cfg.offsetX100 = Math.max(-2000, Math.min(2000, cfg.offsetX100 - scaledStep100())); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("X+"), b -> { cfg.offsetX100 = Math.max(-2000, Math.min(2000, cfg.offsetX100 + scaledStep100())); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
-        addRenderableWidget(Button.builder(Component.literal("Offset Y-"), b -> { cfg.offsetY100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("Y+"), b -> { cfg.offsetY100 += scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Offset Y-"), b -> { cfg.offsetY100 = Math.max(-2000, Math.min(2000, cfg.offsetY100 - scaledStep100())); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Y+"), b -> { cfg.offsetY100 = Math.max(-2000, Math.min(2000, cfg.offsetY100 + scaledStep100())); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
-        addRenderableWidget(Button.builder(Component.literal("Offset Z-"), b -> { cfg.offsetZ100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("Z+"), b -> { cfg.offsetZ100 += scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Offset Z-"), b -> { cfg.offsetZ100 = Math.max(-2000, Math.min(2000, cfg.offsetZ100 - scaledStep100())); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Z+"), b -> { cfg.offsetZ100 = Math.max(-2000, Math.min(2000, cfg.offsetZ100 + scaledStep100())); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
 
         // Section: Pivot
-        addRenderableWidget(Button.builder(Component.literal("Pivot X-"), b -> { cfg.pivotX100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("X+"), b -> { cfg.pivotX100 += scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Pivot X-"), b -> { cfg.pivotX100 = Math.max(-2000, Math.min(2000, cfg.pivotX100 - scaledStep100())); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("X+"), b -> { cfg.pivotX100 = Math.max(-2000, Math.min(2000, cfg.pivotX100 + scaledStep100())); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
-        addRenderableWidget(Button.builder(Component.literal("Pivot Y-"), b -> { cfg.pivotY100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("Y+"), b -> { cfg.pivotY100 += scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Pivot Y-"), b -> { cfg.pivotY100 = Math.max(-2000, Math.min(2000, cfg.pivotY100 - scaledStep100())); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Y+"), b -> { cfg.pivotY100 = Math.max(-2000, Math.min(2000, cfg.pivotY100 + scaledStep100())); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
-        addRenderableWidget(Button.builder(Component.literal("Pivot Z-"), b -> { cfg.pivotZ100 -= scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("Z+"), b -> { cfg.pivotZ100 += scaledStep100(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Pivot Z-"), b -> { cfg.pivotZ100 = Math.max(-2000, Math.min(2000, cfg.pivotZ100 - scaledStep100())); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Z+"), b -> { cfg.pivotZ100 = Math.max(-2000, Math.min(2000, cfg.pivotZ100 + scaledStep100())); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
 
         // Section: Rotation
-        addRenderableWidget(Button.builder(Component.literal("Rot X-"), b -> { cfg.rotXDeg -= scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("X+"), b -> { cfg.rotXDeg += scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Rot X-"), b -> { cfg.rotXDeg = Math.max(-360, Math.min(360, cfg.rotXDeg - scaledRotStepDeg())); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("X+"), b -> { cfg.rotXDeg = Math.max(-360, Math.min(360, cfg.rotXDeg + scaledRotStepDeg())); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
-        addRenderableWidget(Button.builder(Component.literal("Rot Y-"), b -> { cfg.rotYDeg -= scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("Y+"), b -> { cfg.rotYDeg += scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Rot Y-"), b -> { cfg.rotYDeg = Math.max(-360, Math.min(360, cfg.rotYDeg - scaledRotStepDeg())); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Y+"), b -> { cfg.rotYDeg = Math.max(-360, Math.min(360, cfg.rotYDeg + scaledRotStepDeg())); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
-        addRenderableWidget(Button.builder(Component.literal("Rot Z-"), b -> { cfg.rotZDeg -= scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("Z+"), b -> { cfg.rotZDeg += scaledRotStepDeg(); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Rot Z-"), b -> { cfg.rotZDeg = Math.max(-360, Math.min(360, cfg.rotZDeg - scaledRotStepDeg())); save.run(); refreshCopyPreview(); }).bounds(left, top + row * 22, 74, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Z+"), b -> { cfg.rotZDeg = Math.max(-360, Math.min(360, cfg.rotZDeg + scaledRotStepDeg())); save.run(); refreshCopyPreview(); }).bounds(left + colGap, top + row * 22, 50, 20).build());
         row++;
 
         // Section (right): Scale + Step
         addRenderableWidget(Button.builder(Component.literal("Scale -"), b -> {
-            cfg.scale100 = Math.max(1, cfg.scale100 - scaledStep100());
+            cfg.scale100 = Math.max(250, Math.min(1000, cfg.scale100 - scaledStep100()));
             save.run();
             refreshCopyPreview();
         }).bounds(rightX, top + rightRow * 22, 70, 20).build());
         addRenderableWidget(Button.builder(Component.literal("Scale +"), b -> {
-            cfg.scale100 += scaledStep100();
+            cfg.scale100 = Math.max(250, Math.min(1000, cfg.scale100 + scaledStep100()));
             save.run();
             refreshCopyPreview();
         }).bounds(rightX + 74, top + rightRow * 22, 70, 20).build());
@@ -160,26 +160,26 @@ public class LanternDebugScreen extends Screen {
         BLClientConfig cfg = BLClientConfigAccess.get();
         boolean used = false;
         switch (keyCode) {
-            case 262: cfg.offsetX100 += scaledStep100(); used = true; break;
-            case 263: cfg.offsetX100 -= scaledStep100(); used = true; break;
-            case 265: cfg.offsetZ100 -= scaledStep100(); used = true; break;
-            case 264: cfg.offsetZ100 += scaledStep100(); used = true; break;
-            case 266: cfg.offsetY100 += scaledStep100(); used = true; break;
-            case 267: cfg.offsetY100 -= scaledStep100(); used = true; break;
-            case 82: cfg.rotXDeg += scaledRotStepDeg(); used = true; break;
-            case 70: cfg.rotXDeg -= scaledRotStepDeg(); used = true; break;
-            case 84: cfg.rotYDeg += scaledRotStepDeg(); used = true; break;
-            case 71: cfg.rotYDeg -= scaledRotStepDeg(); used = true; break;
-            case 89: cfg.rotZDeg += scaledRotStepDeg(); used = true; break;
-            case 72: cfg.rotZDeg -= scaledRotStepDeg(); used = true; break;
-            case 73: cfg.pivotX100 += scaledStep100(); used = true; break;
-            case 75: cfg.pivotX100 -= scaledStep100(); used = true; break;
-            case 79: cfg.pivotY100 += scaledStep100(); used = true; break;
-            case 76: cfg.pivotY100 -= scaledStep100(); used = true; break;
-            case 80: cfg.pivotZ100 += scaledStep100(); used = true; break;
-            case 59: cfg.pivotZ100 -= scaledStep100(); used = true; break;
-            case 85: cfg.scale100 += scaledStep100(); used = true; break;
-            case 74: cfg.scale100 = Math.max(1, cfg.scale100 - scaledStep100()); used = true; break;
+            case 262: cfg.offsetX100 = Math.max(-2000, Math.min(2000, cfg.offsetX100 + scaledStep100())); used = true; break;
+            case 263: cfg.offsetX100 = Math.max(-2000, Math.min(2000, cfg.offsetX100 - scaledStep100())); used = true; break;
+            case 265: cfg.offsetZ100 = Math.max(-2000, Math.min(2000, cfg.offsetZ100 - scaledStep100())); used = true; break;
+            case 264: cfg.offsetZ100 = Math.max(-2000, Math.min(2000, cfg.offsetZ100 + scaledStep100())); used = true; break;
+            case 266: cfg.offsetY100 = Math.max(-2000, Math.min(2000, cfg.offsetY100 + scaledStep100())); used = true; break;
+            case 267: cfg.offsetY100 = Math.max(-2000, Math.min(2000, cfg.offsetY100 - scaledStep100())); used = true; break;
+            case 82: cfg.rotXDeg = Math.max(-360, Math.min(360, cfg.rotXDeg + scaledRotStepDeg())); used = true; break;
+            case 70: cfg.rotXDeg = Math.max(-360, Math.min(360, cfg.rotXDeg - scaledRotStepDeg())); used = true; break;
+            case 84: cfg.rotYDeg = Math.max(-360, Math.min(360, cfg.rotYDeg + scaledRotStepDeg())); used = true; break;
+            case 71: cfg.rotYDeg = Math.max(-360, Math.min(360, cfg.rotYDeg - scaledRotStepDeg())); used = true; break;
+            case 89: cfg.rotZDeg = Math.max(-360, Math.min(360, cfg.rotZDeg + scaledRotStepDeg())); used = true; break;
+            case 72: cfg.rotZDeg = Math.max(-360, Math.min(360, cfg.rotZDeg - scaledRotStepDeg())); used = true; break;
+            case 73: cfg.pivotX100 = Math.max(-2000, Math.min(2000, cfg.pivotX100 + scaledStep100())); used = true; break;
+            case 75: cfg.pivotX100 = Math.max(-2000, Math.min(2000, cfg.pivotX100 - scaledStep100())); used = true; break;
+            case 79: cfg.pivotY100 = Math.max(-2000, Math.min(2000, cfg.pivotY100 + scaledStep100())); used = true; break;
+            case 76: cfg.pivotY100 = Math.max(-2000, Math.min(2000, cfg.pivotY100 - scaledStep100())); used = true; break;
+            case 80: cfg.pivotZ100 = Math.max(-2000, Math.min(2000, cfg.pivotZ100 + scaledStep100())); used = true; break;
+            case 59: cfg.pivotZ100 = Math.max(-2000, Math.min(2000, cfg.pivotZ100 - scaledStep100())); used = true; break;
+            case 85: cfg.scale100 = Math.max(250, Math.min(1000, cfg.scale100 + scaledStep100())); used = true; break;
+            case 74: cfg.scale100 = Math.max(250, Math.min(1000, cfg.scale100 - scaledStep100())); used = true; break;
             default: break;
         }
         if (used) {

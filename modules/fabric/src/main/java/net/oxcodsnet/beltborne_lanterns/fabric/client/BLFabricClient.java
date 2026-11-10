@@ -1,35 +1,27 @@
 package net.oxcodsnet.beltborne_lanterns.fabric.client;
 
-import net.oxcodsnet.beltborne_lanterns.BLMod;
-import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfig;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
+import net.minecraft.world.entity.EntityType;
+import net.oxcodsnet.beltborne_lanterns.common.client.LanternBeltFeatureRenderer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.oxcodsnet.beltborne_lanterns.common.network.BeltSyncPayload;
-import net.oxcodsnet.beltborne_lanterns.common.network.ToggleLanternPayload;
-import net.oxcodsnet.beltborne_lanterns.common.client.BLClientAbstractions;
-import net.oxcodsnet.beltborne_lanterns.common.client.LanternBeltFeatureRenderer;
-import net.oxcodsnet.beltborne_lanterns.common.client.ClientBeltPlayers;
-import net.oxcodsnet.beltborne_lanterns.common.client.LanternClientLogic;
-import net.oxcodsnet.beltborne_lanterns.common.client.LanternClientScreens;
-import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfigAccess;
+import net.oxcodsnet.beltborne_lanterns.BLMod;
 import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
+import net.oxcodsnet.beltborne_lanterns.common.client.BLClientAbstractions;
+import net.oxcodsnet.beltborne_lanterns.common.client.BeltLanternClientLifecycle;
+import net.oxcodsnet.beltborne_lanterns.common.client.ClientBeltPlayers;
+import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfigAccess;
+import net.oxcodsnet.beltborne_lanterns.common.network.BeltSyncPayload;
 import net.oxcodsnet.beltborne_lanterns.common.network.LampConfigSyncPayload;
-import net.oxcodsnet.beltborne_lanterns.common.physics.LanternSwingManager;
+import net.oxcodsnet.beltborne_lanterns.common.network.ToggleLanternPayload;
 import org.lwjgl.glfw.GLFW;
-import com.mojang.blaze3d.platform.InputConstants;
-import java.util.UUID;
 
 public final class BLFabricClient implements ClientModInitializer {
     // Keybindings
@@ -48,42 +40,26 @@ public final class BLFabricClient implements ClientModInitializer {
 
         // Rebuild registry after client joins a server (tags/registries are synced at this point)
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            client.execute(()->{
-                ClientBeltPlayers.clear();
-                LanternSwingManager.clearAll();
-                LampRegistry.init();
-            });
+            client.execute(BeltLanternClientLifecycle::onClientJoin);
         });
 
         // Clear caches on disconnect as well
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
-            Minecraft.getInstance().execute(() -> {
-                ClientBeltPlayers.clear();
-                LanternSwingManager.clearAll();
-            });
+            client.execute(BeltLanternClientLifecycle::onClientDisconnect);
         });
 
         // Register network receiver: updates local client set
         ClientPlayNetworking.registerGlobalReceiver(BeltSyncPayload.ID, (payload, context) -> {
-            UUID uuid = payload.playerUuid();
-            Item lamp = payload.lampId() != null ? BuiltInRegistries.ITEM.getValue(payload.lampId()) : null;
-            Minecraft.getInstance().execute(() -> {
-                ClientBeltPlayers.setLamp(uuid, lamp);
-            });
+            context.client().execute(() ->
+                    BeltLanternClientLifecycle.onBeltSync(payload.playerUuid(), payload.lampId())
+            );
         });
 
         // This receiver handles lamp configs sent from a dedicated server.
         ClientPlayNetworking.registerGlobalReceiver(LampConfigSyncPayload.ID, (payload, context) -> {
-            Minecraft client = Minecraft.getInstance();
-            client.execute(() -> {
-                var cliCfg = BLClientConfigAccess.get();
-                cliCfg.extraLampLight.clear();
-                payload.lamps().forEach((id, lum) -> cliCfg.extraLampLight.add(new BLClientConfig.ExtraLampEntry(id.toString(), lum)));
-                BLClientConfigAccess.save();
-
-                // Re-initialize the lamp registry with the new data from the server.
-                LampRegistry.init();
-            });
+            context.client().execute(() ->
+                    BeltLanternClientLifecycle.onLampConfigSync(payload.lamps())
+            );
         });
 
         // Register a feature renderer for players to draw the lantern on the belt
@@ -97,9 +73,7 @@ public final class BLFabricClient implements ClientModInitializer {
 
         // Clean up swing manager state when a player entity is unloaded
         ClientEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
-            if (entity instanceof Player) {
-                LanternSwingManager.removePlayer(entity.getUUID());
-            }
+            BeltLanternClientLifecycle.onEntityUnload(entity);
         });
 
         // Optionally register dynamic lights for the belt lantern when LambDynamicLights is present
@@ -137,38 +111,18 @@ public final class BLFabricClient implements ClientModInitializer {
         BLClientAbstractions.init(ClientBeltPlayers::getLamp);
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (openConfigKey.consumeClick()) {
-                if (client.screen == null) {
-                    client.setScreen(LanternClientScreens.openConfig(client.screen));
-                }
-            }
-
-            if (toggleDebugKey.consumeClick()) {
-                if (net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfigAccess.get().debug) {
-                    BLClientAbstractions.setDebugDrawEnabled(!BLClientAbstractions.isDebugDrawEnabled());
-                }
-            }
-
-            if (openDebugEditorKey.consumeClick()) {
-                if (net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfigAccess.get().debug) {
-                    if (client.screen == null) {
-                        client.setScreen(new net.oxcodsnet.beltborne_lanterns.common.client.ui.LanternDebugScreen());
-                    }
-                }
-            }
-
-            if (toggleLanternKey.consumeClick()) {
-                ClientPlayNetworking.send(new ToggleLanternPayload());
-            }
-
-            // Update lantern physics states for players who have a belt lantern
-            LanternClientLogic.tickLanternPhysics(client);
+            BeltLanternClientLifecycle.onClientTick(
+                    client,
+                    openConfigKey.consumeClick(),
+                    toggleDebugKey.consumeClick(),
+                    openDebugEditorKey.consumeClick(),
+                    toggleLanternKey.consumeClick(),
+                    () -> ClientPlayNetworking.send(new ToggleLanternPayload())
+            );
         });
 
         // Final client-ready log (concise, useful to players)
         String dyn = hasLamb ? "enabled" : "disabled";
         BLMod.LOGGER.info("Client ready [Fabric]. Dynamic lights: {}.", dyn);
     }
-
-    // Debug flag is maintained via BLClientAbstractions
 }
