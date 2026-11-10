@@ -12,6 +12,7 @@ import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
  * Provides lazy registration and keeps the common BLConfigs snapshot in sync.
  */
 public final class BLClientConfigAccess {
+    public static final int CURRENT_CONFIG_VERSION = 2;
     private static volatile ConfigHolder<BLClientConfig> HOLDER;
 
     private BLClientConfigAccess() {}
@@ -31,11 +32,12 @@ public final class BLClientConfigAccess {
         synchronized (BLClientConfigAccess.class) {
             if (HOLDER != null) return;
             AutoConfig.register(BLClientConfig.class, GsonConfigSerializer::new);
-            HOLDER = AutoConfig.getConfigHolder(BLClientConfig.class);
-            BLClientConfig clientConfig = HOLDER.getConfig();
+            ConfigHolder<BLClientConfig> holder = AutoConfig.getConfigHolder(BLClientConfig.class);
+            BLClientConfig clientConfig = holder.getConfig();
 
             // Migrate from 1/100 to 1/1000 precision once if old values are detected
-            if (clientConfig.configVersion < BLClientConfig.CURRENT_CONFIG_VERSION) {
+            boolean migrated = clientConfig.configVersion < CURRENT_CONFIG_VERSION;
+            if (migrated) {
                 if (clientConfig.configVersion == 0 && looksLikeOldScale(clientConfig)) {
                     clientConfig.offsetX100 *= 10;
                     clientConfig.offsetY100 *= 10;
@@ -45,8 +47,7 @@ public final class BLClientConfigAccess {
                     clientConfig.pivotZ100  *= 10;
                     clientConfig.scale100   *= 10;
                 }
-                clientConfig.configVersion = BLClientConfig.CURRENT_CONFIG_VERSION;
-                HOLDER.save();
+                clientConfig.configVersion = CURRENT_CONFIG_VERSION;
             }
             clientConfig.extraLampLight.clear(); // Clear existing to avoid duplicates on re-init
 
@@ -54,19 +55,25 @@ public final class BLClientConfigAccess {
 
             // Add/overwrite lamps from BLLampConfigAccess (server-synced/custom)
             BLLampConfigAccess.get().extraLampLight.forEach(entry -> {
+                if (entry == null || entry.id == null) return;
                 tempMap.put(entry.id, new BLClientConfig.ExtraLampEntry(entry.id, entry.luminance));
             });
 
             // Convert tempMap to List and set it to clientConfig.extraLampLight
             clientConfig.extraLampLight.addAll(tempMap.values());
+            if (migrated) holder.save();
             // Seed common snapshot
-            BLConfigs.set(copyToCommon(HOLDER.getConfig()));
+            BLConfigs.set(copyToCommon(holder.getConfig()));
             // Keep snapshot synced on save
-            HOLDER.registerSaveListener((h, cfg) -> {
+            holder.registerSaveListener((h, cfg) -> {
+                BLMod.LOGGER.info("Client config saved: offset=({},{},{}) scale={}", cfg.offsetX100, cfg.offsetY100, cfg.offsetZ100, cfg.scale100);
                 BLConfigs.set(copyToCommon(cfg));
                 BLLampConfig lampCfg = BLLampConfigAccess.get();
                 lampCfg.extraLampLight.clear();
-                cfg.extraLampLight.forEach(entry -> lampCfg.extraLampLight.add(new BLClientConfig.ExtraLampEntry(entry.id, entry.luminance)));
+                cfg.extraLampLight.forEach(entry -> {
+                    if (entry == null || entry.id == null) return;
+                    lampCfg.extraLampLight.add(new BLClientConfig.ExtraLampEntry(entry.id, entry.luminance));
+                });
                 BLLampConfigAccess.save();
                 // Rebuild LampRegistry from updated config
                 LampRegistry.init();
@@ -79,6 +86,7 @@ public final class BLClientConfigAccess {
                     clientConfig.offsetZ100,
                     clientConfig.scale100
             );
+            HOLDER = holder;
         }
     }
 
