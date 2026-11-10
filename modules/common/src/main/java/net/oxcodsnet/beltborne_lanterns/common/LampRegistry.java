@@ -29,6 +29,15 @@ public final class LampRegistry {
     private record LampData(BlockState state, int luminance) {}
 
     private static volatile Map<Item, LampData> LAMPS = Map.of();
+    private static volatile Map<ResourceLocation, Integer> SERVER_OVERRIDE = null;
+
+    public static void setServerOverride(Map<ResourceLocation, Integer> lamps) {
+        SERVER_OVERRIDE = lamps != null ? Collections.unmodifiableMap(new LinkedHashMap<>(lamps)) : null;
+    }
+
+    public static void clearServerOverride() {
+        SERVER_OVERRIDE = null;
+    }
     public static final TagKey<Item> EXTRA_LAMPS_TAG = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(BLMod.MOD_ID, "lamps"));
 
     private LampRegistry() {}
@@ -72,11 +81,17 @@ public final class LampRegistry {
             BLMod.LOGGER.debug("Tags not bound yet; skipping tag-based lamps for now");
         }
 
-        // Register additional lamps from config with custom luminance
-        var cfg = BLLampConfigAccess.get();
-        cfg.extraLampLight.forEach(entry -> {
-            ResourceLocation id = ResourceLocation.tryParse(entry.id);
-            if (id == null) return;
+        // Register additional lamps from the server override or local config.
+        Map<ResourceLocation, Integer> lamps = SERVER_OVERRIDE;
+        if (lamps == null) {
+            lamps = new LinkedHashMap<>();
+            for (var entry : BLLampConfigAccess.get().extraLampLight) {
+                if (entry == null || entry.id == null) continue;
+                ResourceLocation id = ResourceLocation.tryParse(entry.id);
+                if (id != null) lamps.put(id, entry.luminance);
+            }
+        }
+        lamps.forEach((id, luminance) -> {
             Item item = BuiltInRegistries.ITEM.getValue(id);
             if (item == Items.AIR) return;
             if (!(item instanceof BlockItem blockItem)) return;
@@ -84,7 +99,7 @@ public final class LampRegistry {
             if (state.hasProperty(BlockStateProperties.HANGING)) {
                 state = state.setValue(BlockStateProperties.HANGING, false);
             }
-            put(next, item, state, entry.luminance);
+            put(next, item, state, luminance);
         });
 
         LAMPS = Collections.unmodifiableMap(next);
