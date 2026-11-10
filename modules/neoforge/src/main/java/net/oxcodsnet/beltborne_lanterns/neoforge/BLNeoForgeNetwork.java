@@ -1,32 +1,18 @@
 package net.oxcodsnet.beltborne_lanterns.neoforge;
 
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.oxcodsnet.beltborne_lanterns.BLMod;
-import net.oxcodsnet.beltborne_lanterns.common.BeltState;
-import net.oxcodsnet.beltborne_lanterns.common.LampRegistry;
-import net.oxcodsnet.beltborne_lanterns.common.client.ClientBeltPlayers;
-import net.oxcodsnet.beltborne_lanterns.common.compat.CompatibilityLayer;
-import net.oxcodsnet.beltborne_lanterns.common.compat.CompatibilityLayerRegistry;
-import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfig;
-import net.oxcodsnet.beltborne_lanterns.common.config.BLClientConfigAccess;
 import net.oxcodsnet.beltborne_lanterns.common.network.BeltSyncPayload;
 import net.oxcodsnet.beltborne_lanterns.common.network.LampConfigSyncPayload;
 import net.oxcodsnet.beltborne_lanterns.common.network.ToggleLanternPayload;
-import net.oxcodsnet.beltborne_lanterns.common.server.BeltLanternServer;
-import net.oxcodsnet.beltborne_lanterns.common.DynamicLightsCompat;
-
-import java.util.UUID;
-
+import net.oxcodsnet.beltborne_lanterns.common.server.BeltLanternServerLifecycle;
+import net.oxcodsnet.beltborne_lanterns.neoforge.client.BLNeoForgeClientPayloadHandler;
 
 /**
- * Registers server-side network payloads on the MOD bus.
+ * Registers network payloads on the MOD bus.
  *
  * <p>Runs on both dedicated and integrated servers so the toggle payload is
  * handled in singleplayer as well.</p>
@@ -43,69 +29,21 @@ public final class BLNeoForgeNetwork {
         // C2S Payloads (Client to Server)
         registrar.playToServer(ToggleLanternPayload.ID, ToggleLanternPayload.CODEC, (payload, ctx) -> {
             ServerPlayer player = (ServerPlayer) ctx.player();
-            ctx.enqueueWork(() -> {
-                // Try to toggle lantern via compatibility layers
-                for (var layer : CompatibilityLayerRegistry.getLayers()) {
-                    if (layer.tryToggleLantern(player)) return;
-                }
-
-                ItemStack stack = player.getMainHandItem();
-                boolean hasLamp = BeltState.hasLamp(player);
-                if (!hasLamp && !LampRegistry.isLamp(stack)) {
-                    stack = player.getOffhandItem();
-                    if (!LampRegistry.isLamp(stack)) {
-                        BLMod.LOGGER.debug(
-                                "toggle request from {}: handItem={} lampOnBelt={}",
-                                player.getScoreboardName(),
-                                player.getMainHandItem().getItem(),
-                                hasLamp
-                        );
-                        player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.beltborne_lanterns.hold_lantern"), true);
-                        return;
-                    }
-                }
-                Item nowHas = BeltLanternServer.toggleLantern(player, stack);
-                BeltNetworking.broadcastBeltState(player, nowHas);
-                if (nowHas != null) {
-                    // Sync to compatibility layers
-                    for (var layer : CompatibilityLayerRegistry.getLayers()) {
-                        layer.syncToggleOn(player);
-                    }
-                    // Add dynamic light on enable (if mod present)
-                    DynamicLightsCompat.addFor(player);
-                } else {
-                    // Remove dynamic light on disable
-                    DynamicLightsCompat.removeFor(player);
-                }
-            });
+            ctx.enqueueWork(() ->
+                    BeltLanternServerLifecycle.handleToggleLantern(player, BeltNetworking::broadcastBeltState, true)
+            );
         });
 
         // S2C Payloads (Server to Client)
-        // The handlers for these are guaranteed to run on the client side only.
         registrar.playToClient(
                 BeltSyncPayload.ID,
                 BeltSyncPayload.CODEC,
-                (payload, ctx) -> {
-                    UUID uuid = payload.playerUuid();
-                    Item lamp = payload.lampId() != null ? BuiltInRegistries.ITEM.getValue(payload.lampId()) : null;
-                    ClientBeltPlayers.setLamp(uuid, lamp);
-                }
+                BLNeoForgeClientPayloadHandler::handleBeltSync
         );
         registrar.playToClient(
                 LampConfigSyncPayload.ID,
                 LampConfigSyncPayload.CODEC,
-                (payload, ctx) -> {
-                    // This receiver handles lamp configs sent from a dedicated server.
-                    ctx.enqueueWork(() -> {
-                        var cliCfg = BLClientConfigAccess.get();
-                        cliCfg.extraLampLight.clear();
-                        payload.lamps().forEach((id, lum) -> cliCfg.extraLampLight.add(new BLClientConfig.ExtraLampEntry(id.toString(), lum)));
-                        BLClientConfigAccess.save();
-
-                        // Re-initialize the lamp registry with the new data from the server.
-                        LampRegistry.init();
-                    });
-                }
+                BLNeoForgeClientPayloadHandler::handleLampConfigSync
         );
     }
 }

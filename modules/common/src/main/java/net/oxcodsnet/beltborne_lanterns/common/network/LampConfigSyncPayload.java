@@ -20,10 +20,11 @@ public record LampConfigSyncPayload(Map<ResourceLocation, Integer> lamps) implem
         @Override
         public LampConfigSyncPayload decode(RegistryFriendlyByteBuf buf) {
             int size = buf.readVarInt();
+            if (size < 0 || size > 4096) throw new IllegalArgumentException("Invalid lamp config size: " + size);
             Map<ResourceLocation, Integer> map = new LinkedHashMap<>();
             for (int i = 0; i < size; i++) {
                 ResourceLocation id = buf.readResourceLocation();
-                int lum = buf.readVarInt();
+                int lum = Math.max(0, Math.min(15, buf.readVarInt()));
                 map.put(id, lum);
             }
             return new LampConfigSyncPayload(map);
