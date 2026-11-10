@@ -1,0 +1,103 @@
+// Convention plugin for the common module
+// Provides shared code compilation and export configurations
+
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+// groupId: add platform suffix (e.g. net.oxcodsnet.beltborne_lanterns.common)
+group = "${rootProject.maven_group}.common"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+    withSourcesJar()
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+    maven { url = 'https://maven.shedaniel.me/' }
+    maven { url = 'https://maven.gegy.dev' }
+    maven { url = 'https://api.modrinth.com/maven' }
+}
+
+// Configurations to export sources to loader modules
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+        attributes {
+            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category, Category.LIBRARY))
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, 'common-java'))
+        }
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+        attributes {
+            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category, Category.LIBRARY))
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, 'common-resources'))
+        }
+    }
+}
+
+// Export source directories
+artifacts {
+    commonJava(sourceSets.main.java.sourceDirectories.singleFile) {
+        builtBy(tasks.named('classes'))
+    }
+    commonResources(sourceSets.main.resources.sourceDirectories.singleFile)
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 25
+}
+
+// Maven publishing configuration
+publishing {
+    def mcTag = "mc" + rootProject.minecraft_version
+
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId = "${rootProject.archives_name}-common-${mcTag}"
+
+            pom {
+                name = "${rootProject.mod_name} - Common"
+                description = rootProject.findProperty('mod_description') ?: ''
+            }
+        }
+    }
+
+    // Repository from .env / gradle.properties (identical to architectury-loom)
+    repositories {
+        def repoUrl = rootProject.ext.resolveMavenRepoUrl()
+        if (repoUrl) {
+            maven {
+                name = rootProject.ext.resolveMavenRepoName()
+                url = uri(repoUrl)
+
+                def user  = rootProject.ext.resolveMavenRepoUsername()
+                def pass  = rootProject.ext.resolveMavenRepoPassword()
+                def token = rootProject.ext.resolveMavenRepoToken()
+
+                if ((user && pass) || token) {
+                    credentials {
+                        if (user && pass) {
+                            username = user
+                            password = pass
+                        } else {
+                            username = user ?: 'token'
+                            password = token
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

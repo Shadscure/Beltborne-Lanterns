@@ -1,0 +1,19 @@
+plugins {
+    id 'multiloader-common'
+    id 'net.neoforged.moddev'
+}
+
+neoForge {
+    neoFormVersion = rootProject.neoform_version
+}
+
+dependencies {
+    // Mixin compile-only (processing happens in loader modules with proper mappings)
+    compileOnly "org.spongepowered:mixin:0.8.7"
+
+    // Cloth Config API (compile-only in common, using NeoForge variant for Mojmap compatibility)
+    compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${rootProject.cloth_config_version}"
+
+    // LambDynamicLights API (compile-only, 26.1+ is unobfuscated with no :mojmap classifier)
+    compileOnly "dev.lambdaurora.lambdynamiclights:lambdynamiclights-api:${rootProject.lambdynamiclights_version}"
+}
